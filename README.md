@@ -45,3 +45,7 @@ Users are required for the project but are not counted as one of the four main f
 ![db-schema]
 
 [db-schema]: ./images/Screenshot%202025-02-06%20at%2010.21.20 AM.png
+
+[wireframe]
+
+[wireframe]:https://excalidraw.com/#room=8962c9915c4ef761b7d7,ep07FQmN1YqxidpwTDJK9w
