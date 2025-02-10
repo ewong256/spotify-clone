@@ -20,5 +20,10 @@ class Album(db.Model):
 
     #RELATIONSHIPS
     user = db.relationship("User", back_populates="albums")
-    songs = db.relationship("AlbumSong", back_populates="album")
-    libraries = db.relationship("Library", back_populates="album")
+    songs = db.relationship("AlbumSong", back_populates="album", cascade="all, delete-orphan")
+    libraries = db.relationship("Library", back_populates="album", cascade="all, delete-orphan")
+
+
+    #Same User cannot make Album with same Name:
+#     __table_args__ = (
+#     db.UniqueConstraint('title', 'user_id', name='unique_album_title_user'),)
