@@ -16,5 +16,6 @@ class Like(db.Model):
     # album_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('albums.id')))
     # playlist_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('playlists.id')))
 
+    #RELATIONSHIPS
     user = db.relationship("User", back_populates="likes")
     song = db.relationship("Song", back_populates="likes")

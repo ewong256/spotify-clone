@@ -18,16 +18,17 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), nullable=False, unique=True)
     hashed_password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), nullable=False)
+    banner_image_url = db.Column(db.String(500), nullable=False) #AWS S3 storage URL #ARTIST ONLY
     avatar_url = db.Column(db.String(500))
     created_at = db.Column(DateTime, default=func.now())
 
     #RELATIONSHIPS
-    song = db.relationship("Song", back_populates="user")
-    like= db.relationship("Like", back_populates="user")
-    notification= db.relationship("Notification", back_populates="user")
-    album=db.relationship("Album", back_populates="user")
-    library=db.relationship("Library", back_populates="user")
-    playlist=db.relationship("Playlist", back_populates="user")
+    songs = db.relationship("Song", back_populates="user")
+    likes= db.relationship("Like", back_populates="user")
+    notifications= db.relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    albums=db.relationship("Album", back_populates="user")
+    libraries=db.relationship("Library", back_populates="user")
+    playlists=db.relationship("Playlist", back_populates="user")
 
 
     @property

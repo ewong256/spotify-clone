@@ -20,4 +20,5 @@ class Notification(db.Model):
 
 
 
-# COMBACK TO UPDATE BACK POPULATE
+# RELATIONSHIP
+user = db.relationship("User", back_populates="notifications")

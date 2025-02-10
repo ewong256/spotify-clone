@@ -14,9 +14,11 @@ class Album(db.Model):
     title = db.Column(db.String(250), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), nullable=False) #in production, want to reference correct table
     image_url = db.Column(db.String(500), nullable=False) #AWS S3 storage URL
+    # banner_image_url = db.Column(db.String(500), nullable=False) #AWS S3 storage URL
     created_at = db.Column(DateTime, default=func.now())
     updated_at = db.Column(DateTime, onupdate=func.now())
 
     #RELATIONSHIPS
     user = db.relationship("User", back_populates="albums")
     songs = db.relationship("AlbumSong", back_populates="album")
+    libraries = db.relationship("Library", back_populates="album")

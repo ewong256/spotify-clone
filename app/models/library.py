@@ -16,8 +16,9 @@ class Library(db.Model):
     album_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('albums.id')))
     playlist_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('playlists.id')))
 
-
-# COMBACK TO UPDATE BACK POPULATE
-    # uploader = db.relationship("User", back_populates="songs")
-    # album = db.relationship("Album", back_populates="songs")
-    # likes = db.relationship("Like", back_populates="song", cascade="all, delete-orphan")
+    #RELATIONSHIPS
+    user = db.relationship("User", back_populates="libraries")
+    song= db.relationship("Song", back_populates="libraries")
+    album= db.relationship("Album", back_populates="libraries")
+    playlist= db.relationship("Playlist", back_populates="libraries")
+    like= db.relationship("Like", back_populates="libraries")
