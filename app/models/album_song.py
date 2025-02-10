@@ -14,8 +14,6 @@ class AlbumSong(db.Model):
     album_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('albums.id')), nullable=False) #in production, want to reference correct table
     song_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('songs.id')), nullable=False)
 
-
-# COMBACK TO UPDATE BACK POPULATE
-    # uploader = db.relationship("User", back_populates="songs")
-    # album = db.relationship("Album", back_populates="songs")
-    # likes = db.relationship("Like", back_populates="song", cascade="all, delete-orphan")
+    #RELATIONSHIPS
+    album = db.relationship("Album", back_populates="songs")
+    song = db.relationship("Song", back_populates="albums")

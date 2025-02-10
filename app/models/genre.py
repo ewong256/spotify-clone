@@ -13,3 +13,4 @@ class Genre(db.Model):
     name = db.Column(db.String(50), nullable=False)
 
     ### Need relationships
+    song = db.relationship("SongGenre", back_populates="genre")

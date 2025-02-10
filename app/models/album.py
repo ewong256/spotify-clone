@@ -17,8 +17,6 @@ class Album(db.Model):
     created_at = db.Column(DateTime, default=func.now())
     updated_at = db.Column(DateTime, onupdate=func.now())
 
-
-# COMBACK TO UPDATE BACK POPULATE
-    # uploader = db.relationship("User", back_populates="songs")
-    # album = db.relationship("Album", back_populates="songs")
-    # likes = db.relationship("Like", back_populates="song", cascade="all, delete-orphan")
+    #RELATIONSHIPS
+    user = db.relationship("User", back_populates="albums")
+    songs = db.relationship("AlbumSong", back_populates="album")
