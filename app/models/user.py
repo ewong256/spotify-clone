@@ -2,8 +2,8 @@ from .db import db, environment, SCHEMA, add_prefix_for_prod
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-from sqlalchemy import func
+# from datetime import datetime
+from sqlalchemy import func, DateTime
 
 
 
@@ -19,7 +19,7 @@ class User(db.Model, UserMixin):
     hashed_password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), nullable=False)
     avatar_url = db.Column(db.String(500))
-    created_at = db.Column(db.DateTime, default=func.now())
+    created_at = db.Column(DateTime, default=func.now())
 
     @property
     def password(self):
