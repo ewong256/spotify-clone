@@ -21,6 +21,15 @@ class User(db.Model, UserMixin):
     avatar_url = db.Column(db.String(500))
     created_at = db.Column(DateTime, default=func.now())
 
+    #RELATIONSHIPS
+    song = db.relationship("Song", back_populates="user")
+    like= db.relationship("Like", back_populates="user")
+    notification= db.relationship("Notification", back_populates="user")
+    album=db.relationship("Album", back_populates="user")
+    library=db.relationship("Library", back_populates="user")
+    playlist=db.relationship("Playlist", back_populates="user")
+
+
     @property
     def password(self):
         return self.hashed_password

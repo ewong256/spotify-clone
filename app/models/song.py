@@ -18,6 +18,8 @@ class Song(db.Model):
     created_at = db.Column(DateTime, default=func.now())
     updated_at = db.Column(DateTime, onupdate=func.now())
 
-    uploader = db.relationship("User", back_populates="songs")
-    album = db.relationship("Album", back_populates="songs")
+    user = db.relationship("User", back_populates="songs")
+    album = db.relationship("AlbumSong", back_populates="songs")
     likes = db.relationship("Like", back_populates="song", cascade="all, delete-orphan")
+    genre= db.relationship("SongGenre", back_populates="song")
+    playlist= db.relationship("PlaylistSong", back_populates="song")
