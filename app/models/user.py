@@ -18,7 +18,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), nullable=False, unique=True)
     hashed_password = db.Column(db.String(255), nullable=False)
     # role = db.Column(db.String(50), nullable=False)
-    banner_image_url = db.Column(db.String(500), nullable=False) #AWS S3 storage URL #ARTIST ONLY
+    banner_image_url = db.Column(db.String(500), nullable=True) #AWS S3 storage URL #ARTIST ONLY
     avatar_url = db.Column(db.String(500))
     created_at = db.Column(DateTime, default=func.now())
 

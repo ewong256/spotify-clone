@@ -17,8 +17,5 @@ class Notification(db.Model):
     created_at = db.Column(DateTime, default=func.now())
     read_at = db.Column(DateTime)
 
-
-
-
-# RELATIONSHIP
-user = db.relationship("User", back_populates="notifications", cascade="all, delete-orphan") #passive_delete Makes SQLAlchemy respect DB-level cascade
+    # RELATIONSHIP
+    user = db.relationship("User", back_populates="notifications") #passive_delete Makes SQLAlchemy respect DB-level cascade

@@ -15,8 +15,8 @@ class AlbumSong(db.Model):
     song_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('songs.id')), nullable=False)
 
     #RELATIONSHIPS
-    album = db.relationship("Album", back_populates="songs", cascade="all, delete-orphan")
-    song = db.relationship("Song", back_populates="albums", cascade="all, delete-orphan")
+    album = db.relationship("Album", back_populates="songs")
+    song = db.relationship("Song", back_populates="albums")
 
 
     #Same Song cannot appear again in same Album:

@@ -18,7 +18,7 @@ class Library(db.Model):
 
     #RELATIONSHIPS
     user = db.relationship("User", back_populates="libraries")
-    song= db.relationship("Song", back_populates="libraries", cascade="all, delete-orphan")
-    album= db.relationship("Album", back_populates="libraries", cascade="all, delete-orphan")
-    playlist= db.relationship("Playlist", back_populates="libraries", cascade="all, delete-orphan")
+    song= db.relationship("Song", back_populates="libraries")
+    album= db.relationship("Album", back_populates="libraries")
+    playlist= db.relationship("Playlist", back_populates="libraries")
     # like= db.relationship("Like", back_populates="libraries")
