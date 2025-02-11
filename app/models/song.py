@@ -13,7 +13,7 @@ class Song(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(250), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), nullable=False) #in production, want to reference correct table
-    album_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('albums.id')), nullable=False)
+    album_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('albums.id')), nullable=True)
     song_url = db.Column(db.String(500), nullable=False) #AWS S3 storage URL
     image_url = db.Column(db.String(500), nullable=False) #AWS S3 storage URL
     created_at = db.Column(DateTime, default=func.now())
