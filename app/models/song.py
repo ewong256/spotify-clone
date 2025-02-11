@@ -23,6 +23,6 @@ class Song(db.Model):
     user = db.relationship("User", back_populates="songs")
     albums = db.relationship("AlbumSong", back_populates="song", cascade="all, delete-orphan")
     likes = db.relationship("Like", back_populates="song", cascade="all, delete-orphan")
-    genre= db.relationship("SongGenre", back_populates="song", cascade="all, delete-orphan")
+    # genre= db.relationship("SongGenre", back_populates="song", cascade="all, delete-orphan")
     playlist= db.relationship("PlaylistSong", back_populates="song", cascade="all, delete-orphan")
-    libraries = db.relationship("Library", back_populates="song", cascade="all, delete-orphan")
+    # libraries = db.relationship("Library", back_populates="song", cascade="all, delete-orphan")

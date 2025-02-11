@@ -17,8 +17,8 @@ class Library(db.Model):
     playlist_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('playlists.id')))
 
     #RELATIONSHIPS
-    user = db.relationship("User", back_populates="libraries")
-    song= db.relationship("Song", back_populates="libraries")
-    album= db.relationship("Album", back_populates="libraries")
-    playlist= db.relationship("Playlist", back_populates="libraries")
+    # user = db.relationship("User", back_populates="libraries")
+    # song= db.relationship("Song", back_populates="libraries")
+    # album= db.relationship("Album", back_populates="libraries")
+    # playlist= db.relationship("Playlist", back_populates="libraries")
     # like= db.relationship("Like", back_populates="libraries")

@@ -14,7 +14,7 @@ class Playlist(db.Model):
     title = db.Column(db.String(250), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), nullable=False) #in production, want to reference correct table
     image_url = db.Column(db.String(500), nullable=False) #AWS S3 storage URL
-    special_type=db.Column(db.String(50), nullable=True) #Added for "Liked_Songs"
+    # special_type=db.Column(db.String(50), nullable=True) #Added for "Liked_Songs"
     created_at = db.Column(DateTime, default=func.now())
     updated_at = db.Column(DateTime, onupdate=func.now())
 
@@ -22,4 +22,4 @@ class Playlist(db.Model):
   #RELATIONSHIPS
     user = db.relationship("User", back_populates="playlists")
     songs = db.relationship("PlaylistSong", back_populates="playlist", cascade="all, delete-orphan")
-    libraries = db.relationship("Library", back_populates="playlist", cascade="all, delete-orphan")
+    # libraries = db.relationship("Library", back_populates="playlist", cascade="all, delete-orphan")

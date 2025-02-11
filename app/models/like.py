@@ -31,16 +31,16 @@ class Like(db.Model):
         self.song_id = song_id
 
         # Add to Liked Songs playlist
-        liked_playlist = Playlist.query.filter_by(user_id=user_id, special_type='liked_songs').first()
-        if not liked_playlist:
-            liked_playlist = Playlist(
-                user_id=user_id,
-                title="Liked Songs",
-                image_url="default_liked_image_url",  # Add a default image
-                special_type="liked_songs"
-            )
-            db.session.add(liked_playlist)
-            db.session.commit()
+        # liked_playlist = Playlist.query.filter_by(user_id=user_id, special_type='liked_songs').first()
+        # if not liked_playlist:
+        #     liked_playlist = Playlist(
+        #         user_id=user_id,
+        #         title="Liked Songs",
+        #         image_url="default_liked_image_url",  # Add a default image
+        #         special_type="liked_songs"
+        #     )
+        #     db.session.add(liked_playlist)
+        #     db.session.commit()
 
-        playlist_song = PlaylistSong(playlist_id=liked_playlist.id, song_id=song_id)
-        db.session.add(playlist_song)
+        # playlist_song = PlaylistSong(playlist_id=liked_playlist.id, song_id=song_id)
+        # db.session.add(playlist_song)

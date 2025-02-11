@@ -13,4 +13,4 @@ class Genre(db.Model):
     name = db.Column(db.String(50), nullable=False, unique=True)
 
     #Relationships
-    song = db.relationship("SongGenre", back_populates="genre", cascade="all, delete-orphan")
+    # song = db.relationship("SongGenre", back_populates="genre", cascade="all, delete-orphan")

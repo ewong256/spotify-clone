@@ -16,5 +16,5 @@ class SongGenre(db.Model):
 
 
 # RELATIONSHIPS
-    song = db.relationship("Song", back_populates="genre")
-    genre = db.relationship("Genre", back_populates="song")
+    # song = db.relationship("Song", back_populates="genre")
+    # genre = db.relationship("Genre", back_populates="song")

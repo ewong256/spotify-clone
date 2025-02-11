@@ -1,26 +1,26 @@
 from app.models import db, User, environment, SCHEMA
 from sqlalchemy.sql import text
-from werkzeug.security import generate_password_hash
+# from werkzeug.security import generate_password_hash
 
 def seed_users():
     demo = User(
-        username='Demo', 
-        email='demo@aa.io', 
-        password='password1', 
-        banner_image_url='https://example.com/banner1.jpg',  
-        avatar_url='https://example.com/avatar1.jpg'  
+        username='DemoUser',
+        email='demo1@aa.io',
+        password='password1',
+        banner_image_url='https://example.com/banner1.jpg',
+        avatar_url='https://example.com/avatar1.jpg'
     )
     marnie = User(
-        username='marnie', 
-        email='marnie@aa.io', 
-        password='password2', 
+        username='marnie',
+        email='marnie@aa.io',
+        password='password2',
         banner_image_url='https://example.com/banner2.jpg',
         avatar_url='https://example.com/avatar2.jpg'
     )
     bobbie = User(
-        username='bobbie', 
-        email='bobbie@aa.io', 
-        password='password3', 
+        username='bobbie',
+        email='bobbie@aa.io',
+        password='password3',
         banner_image_url='https://example.com/banner3.jpg',
         avatar_url='https://example.com/avatar3.jpg'
     )
@@ -41,5 +41,5 @@ def undo_users():
         db.session.execute(f"TRUNCATE table {SCHEMA}.users RESTART IDENTITY CASCADE;")
     else:
         db.session.execute(text("DELETE FROM users"))
-        
+
     db.session.commit()
