@@ -12,17 +12,17 @@ class Song(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(250), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), ondelete='CASCADE', nullable=False) #in production, want to reference correct table
-    album_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('albums.id')),ondelete='CASCADE', nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), nullable=False) #in production, want to reference correct table
+    album_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('albums.id')), nullable=False)
     song_url = db.Column(db.String(500), nullable=False) #AWS S3 storage URL
     image_url = db.Column(db.String(500), nullable=False) #AWS S3 storage URL
     created_at = db.Column(DateTime, default=func.now())
     updated_at = db.Column(DateTime, onupdate=func.now())
 
     #RELATIONSHIP
-    user = db.relationship("User", back_populates="songs", passive_deletes=True)
-    albums = db.relationship("AlbumSong", back_populates="song", cascade="all, delete-orphan", passive_deletes=True)
-    likes = db.relationship("Like", back_populates="song", cascade="all, delete-orphan", passive_deletes=True)
-    genre= db.relationship("SongGenre", back_populates="song", cascade="all, delete-orphan", passive_deletes=True)
-    playlist= db.relationship("PlaylistSong", back_populates="song", cascade="all, delete-orphan", passive_deletes=True)
-    libraries = db.relationship("Library", back_populates="song", cascade="all, delete-orphan", passive_deletes=True)
+    user = db.relationship("User", back_populates="songs")
+    albums = db.relationship("AlbumSong", back_populates="song", cascade="all, delete-orphan")
+    likes = db.relationship("Like", back_populates="song", cascade="all, delete-orphan")
+    genre= db.relationship("SongGenre", back_populates="song", cascade="all, delete-orphan")
+    playlist= db.relationship("PlaylistSong", back_populates="song", cascade="all, delete-orphan")
+    libraries = db.relationship("Library", back_populates="song", cascade="all, delete-orphan")

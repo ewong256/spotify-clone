@@ -12,7 +12,7 @@ class PlaylistSong(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     playlist_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('playlists.id')), nullable=False) #in production, want to reference correct table
-    song_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('songs.id')), nullable=False, ondelete='CASCADE')
+    song_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('songs.id')), nullable=False)
 
 
   #RELATIONSHIPS

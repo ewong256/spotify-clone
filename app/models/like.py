@@ -1,8 +1,8 @@
 from .db import db, environment, SCHEMA, add_prefix_for_prod
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, DateTime
-from models.playlist import Playlist
-from models.playlist_song import PlaylistSong
+from .playlist import Playlist
+from .playlist_song import PlaylistSong
 
 
 
