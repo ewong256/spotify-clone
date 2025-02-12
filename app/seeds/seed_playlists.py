@@ -1,4 +1,5 @@
-from app.models import db, Playlist
+from app.models import db, Playlist, environment, SCHEMA
+from sqlalchemy.sql import text
 
 def seed_playlists():
     playlist1 = Playlist(
@@ -14,5 +15,9 @@ def seed_playlists():
     db.session.commit()
 
 def undo_playlists():
-    db.session.execute('DELETE FROM playlists')
+    if environment == "production":
+        db.session.execute(f"TRUNCATE table {SCHEMA}.playlists RESTART IDENTITY CASCADE;")
+    else:
+        db.session.execute(text("DELETE FROM playlists"))
+
     db.session.commit()

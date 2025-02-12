@@ -1,4 +1,5 @@
-from app.models import db, Song, Album
+from app.models import db, Song, Album, environment, SCHEMA
+from sqlalchemy.sql import text
 
 def seed_songs():
 
@@ -36,5 +37,9 @@ def seed_songs():
     db.session.commit()
 
 def undo_songs():
-    db.session.execute('DELETE FROM songs')
+    if environment == "production":
+        db.session.execute(f"TRUNCATE table {SCHEMA}.songs RESTART IDENTITY CASCADE;")
+    else:
+        db.session.execute(text("DELETE FROM songs"))
+
     db.session.commit()
