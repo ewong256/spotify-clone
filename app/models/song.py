@@ -26,3 +26,13 @@ class Song(db.Model):
     # genre= db.relationship("SongGenre", back_populates="song", cascade="all, delete-orphan")
     playlist= db.relationship("PlaylistSong", back_populates="song", cascade="all, delete-orphan")
     # libraries = db.relationship("Library", back_populates="song", cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'user_id': self.user_id,
+            'image_url': self.image_url,
+            'song_url': self.song_url,
+            'album_id': self.album_id
+        }

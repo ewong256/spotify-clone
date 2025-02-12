@@ -25,10 +25,10 @@ class User(db.Model, UserMixin):
     #RELATIONSHIPS
     songs = db.relationship("Song", back_populates="user")
     likes= db.relationship("Like", back_populates="user")
-    # notifications= db.relationship("Notification", back_populates="user", cascade="all, delete-orphan")
     albums=db.relationship("Album", back_populates="user")
-    # libraries=db.relationship("Library", back_populates="user")
     playlists=db.relationship("Playlist", back_populates="user")
+    # notifications= db.relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    # libraries=db.relationship("Library", back_populates="user")
 #     liked_songs_playlist=db.relationship(
 #         "Playlist",
 #         primaryjoin="and_(Playlist.user_id == User.id, Playlist.special_type == 'liked_songs')",
