@@ -1,4 +1,5 @@
-from app.models import db, Like
+from app.models import db, Like, environment, SCHEMA
+from sqlalchemy.sql import text
 
 def seed_likes():
     like1 = Like(user_id=1, song_id=1)
@@ -17,5 +18,9 @@ def seed_likes():
     db.session.commit()
 
 def undo_likes():
-    db.session.execute('DELETE FROM likes')
+    if environment == "production":
+        db.session.execute(f"TRUNCATE table {SCHEMA}.likes RESTART IDENTITY CASCADE;")
+    else:
+        db.session.execute(text("DELETE FROM likes"))
+
     db.session.commit()
