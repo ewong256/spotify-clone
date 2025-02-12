@@ -27,3 +27,11 @@ class Album(db.Model):
     #Same User cannot make Album with same Name:
 #     __table_args__ = (
 #     db.UniqueConstraint('title', 'user_id', name='unique_album_title_user'),)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'user_id': self.user_id,
+            'image_url': self.image_url
+        }
