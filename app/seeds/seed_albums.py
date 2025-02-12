@@ -9,7 +9,7 @@ def seed_albums():
     album3 = Album(
         title='Album Three', user_id=3, image_url='http://example.com/album3.jpg')
     album4 = Album(
-        title='Album Four', user_id=4, image_url='http://example.com/album4.jpg')
+        title='Album Four', user_id=3, image_url='http://example.com/album4.jpg')
 
 
     db.session.add(album1)
