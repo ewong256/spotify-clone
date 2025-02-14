@@ -1,42 +1,35 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { FaHeart, FaPlay, FaEllipsisH } from "react-icons/fa";
+import { fetchSongs } from "../../redux/songsSlice";
+import { fetchUsers } from "../../redux/usersSlice";
+import { fetchAlbums } from "../../redux/albumsSlice";
 import "./SongPage.css"; 
 
 const SongsPage = () => {
-    const [songs, setSongs] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [albums, setAlbums] = useState([]);
+    const dispatch = useDispatch();
+    const { songs, status: songsStatus, error: songsError } = useSelector((state) => state.songs);
+    const { users } = useSelector((state) => state.users);
+    const { albums } = useSelector((state) => state.albums);
 
     useEffect(() => {
-        
-        fetch("/api/songs")
-            .then((res) => res.json())
-            .then((data) => setSongs(data.songs))
-            .catch((err) => console.error("Error fetching songs:", err));
+        if (songsStatus === "idle") dispatch(fetchSongs());
+        dispatch(fetchUsers());
+        dispatch(fetchAlbums());
+    }, [songsStatus, dispatch]);
 
-        
-        fetch("/api/users")
-            .then((res) => res.json())
-            .then((data) => setUsers(data.users))
-            .catch((err) => console.error("Error fetching users:", err));
-
-        fetch("/api/albums")
-            .then((res) => res.json())
-            .then((data) => setAlbums(data.albums))
-            .catch((err) => console.error("Error fetching albums:", err));
-    }, []);
-
-    
     const getArtistName = (userId) => {
         const user = users.find((user) => user.id === userId);
         return user ? user.username : "Unknown Artist";
     };
 
-
     const getAlbumTitle = (albumId) => {
         const album = albums.find((album) => album.id === albumId);
         return album ? album.title : "Unknown Album";
     };
+
+    if (songsStatus === "loading") return <p>Loading songs...</p>;
+    if (songsStatus === "failed") return <p>Error: {songsError}</p>;
 
     return (
         <div className="p-8 bg-gray-900 min-h-screen text-white">

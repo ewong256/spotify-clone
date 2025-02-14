@@ -1,23 +1,83 @@
 /* SongPage.css */
+
+/* Container for the page */
 .song-container {
     padding: 20px;
+    background-color: #2d2d2d;
+    min-height: 100vh;
   }
   
+  /* Table styling */
   .song-table {
     width: 100%;
     margin-top: 20px;
+    border-collapse: collapse;
   }
   
-  .song-table th, .song-table td {
-    padding: 10px;
+  /* Header styling */
+  .song-table th {
+    padding: 12px 15px;
     text-align: left;
+    background-color: #1a1a1a;
+    color: #f1f1f1;
   }
   
-  .song-actions button {
-    margin-right: 10px;
+  /* Table row styling */
+  .song-table td {
+    padding: 12px 15px;
+    text-align: left;
+    color: #ccc;
   }
   
+  /* Row hover effect */
   .song-row:hover {
     background-color: #333;
+    cursor: pointer;
   }
   
+  /* Button styling for actions */
+  .song-actions button {
+    margin-right: 10px;
+    padding: 6px 10px;
+    border-radius: 5px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    color: #ccc;
+    transition: all 0.3s ease;
+  }
+  
+  /* Hover effects for the buttons */
+  .song-actions button:hover {
+    border: 1px solid #888;
+    background-color: #444;
+  }
+  
+  /* Icon button hover colors */
+  .song-actions .play-btn:hover {
+    color: #4CAF50; /* Play button color */
+  }
+  
+  .song-actions .heart-btn:hover {
+    color: #FF4081; /* Heart button color */
+  }
+  
+  .song-actions .more-btn:hover {
+    color: #aaa; /* More options button color */
+  }
+  
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .song-table th, .song-table td {
+      padding: 8px 10px;
+    }
+  
+    .song-container {
+      padding: 10px;
+    }
+  
+    .song-actions button {
+      font-size: 14px;
+      padding: 5px 8px;
+    }
+  }
+
