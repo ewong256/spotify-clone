@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaHeart, FaPlay, FaEllipsisH } from "react-icons/fa";
+import "./SongPage.css"; 
 
 const SongsPage = () => {
     const [songs, setSongs] = useState([]);
