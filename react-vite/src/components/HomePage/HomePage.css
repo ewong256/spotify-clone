@@ -1,0 +1,34 @@
+.homepage-container {
+    padding: 20px;
+    background-color: #121212;
+    min-height: 100vh;
+    color: white;
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+.section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.list {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.item {
+    background-color: #1e1e1e;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    transition: background 0.3s;
+}
+
+.item:hover {
+    background-color: #333;
+}
