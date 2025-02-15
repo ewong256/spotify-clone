@@ -51,7 +51,7 @@ def get_playlist(playlist_id):
         "songs": songs
     })
 
-# UPDATE Playlist
+# UPDATE/PUT Playlist
 @playlist_routes.route('/<int:playlist_id>', methods=['PUT'])
 @login_required
 def update_playlist(playlist_id):

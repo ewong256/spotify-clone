@@ -6,9 +6,12 @@ import {
 } from "redux";
 import thunk from "redux-thunk";
 import sessionReducer from "./session";
+import playlistsReducer from "./playlistReducer";
+
 
 const rootReducer = combineReducers({
   session: sessionReducer,
+  playlists: playlistsReducer, //ADDED playlists to Redux Store
 });
 
 let enhancer;
