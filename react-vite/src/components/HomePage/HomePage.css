@@ -28,7 +28,3 @@
     color: white;
     transition: background 0.3s;
 }
-
-.item:hover {
-    background-color: #333;
-}
