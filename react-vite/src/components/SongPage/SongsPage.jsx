@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FaHeart, FaPlay, FaEllipsisH } from "react-icons/fa";
-import { fetchSongs } from "../../redux/songsSlice";
+import { fetchSongs } from "../../redux/SongsSlice.js";
 import { fetchUsers } from "../../redux/usersSlice";
 import { fetchAlbums } from "../../redux/albumsSlice";
 import "./SongPage.css"; 
