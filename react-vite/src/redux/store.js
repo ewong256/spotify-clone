@@ -6,7 +6,7 @@ import {
 } from "redux";
 import thunk from "redux-thunk";
 import sessionReducer from "./session";
-import songsReducer from "./songsSlice"; // ✅ Import your songs slice
+import songsReducer from "./SongsSlice"; // ✅ Import your songs slice
 
 const rootReducer = combineReducers({
   session: sessionReducer,
@@ -28,5 +28,3 @@ const configureStore = (preloadedState) => {
 };
 
 export default configureStore;
-
-
