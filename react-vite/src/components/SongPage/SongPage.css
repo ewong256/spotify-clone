@@ -1,83 +1,62 @@
-/* SongPage.css */
-
-/* Container for the page */
 .song-container {
-    padding: 20px;
-    background-color: #2d2d2d;
-    min-height: 100vh;
-  }
-  
-  /* Table styling */
-  .song-table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-  }
-  
-  /* Header styling */
-  .song-table th {
-    padding: 12px 15px;
-    text-align: left;
-    background-color: #1a1a1a;
-    color: #f1f1f1;
-  }
-  
-  /* Table row styling */
-  .song-table td {
-    padding: 12px 15px;
-    text-align: left;
-    color: #ccc;
-  }
-  
-  /* Row hover effect */
-  .song-row:hover {
-    background-color: #333;
-    cursor: pointer;
-  }
-  
-  /* Button styling for actions */
-  .song-actions button {
-    margin-right: 10px;
-    padding: 6px 10px;
-    border-radius: 5px;
-    background-color: transparent;
-    border: 1px solid transparent;
-    color: #ccc;
-    transition: all 0.3s ease;
-  }
-  
-  /* Hover effects for the buttons */
-  .song-actions button:hover {
-    border: 1px solid #888;
-    background-color: #444;
-  }
-  
-  /* Icon button hover colors */
-  .song-actions .play-btn:hover {
-    color: #4CAF50; /* Play button color */
-  }
-  
-  .song-actions .heart-btn:hover {
-    color: #FF4081; /* Heart button color */
-  }
-  
-  .song-actions .more-btn:hover {
-    color: #aaa; /* More options button color */
-  }
-  
-  /* Mobile responsiveness */
-  @media (max-width: 768px) {
-    .song-table th, .song-table td {
-      padding: 8px 10px;
-    }
-  
-    .song-container {
-      padding: 10px;
-    }
-  
-    .song-actions button {
-      font-size: 14px;
-      padding: 5px 8px;
-    }
-  }
+  padding: 20px;
+  background-color: #2d2d2d;
+  min-height: 100vh;
+  color: #f1f1f1;
+}
 
+.song-table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.song-table th {
+  padding: 14px;
+  text-align: left;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.song-table td {
+  padding: 12px 15px;
+  text-align: left;
+  color: #ccc;
+  border-bottom: 1px solid #444;
+}
+
+/* Removed .song-row:hover */
+
+.song-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.song-actions button {
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: #ccc;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.song-actions .play-btn:hover {
+  color: #4CAF50; /* Play button (Green) */
+  transform: scale(1.1);
+}
+
+.song-actions .heart-btn:hover {
+  color: #FF4081; /* Heart button (Pink) */
+  transform: scale(1.1);
+}
+
+.song-actions .more-btn:hover {
+  color: #aaa; /* More Options */
+}
