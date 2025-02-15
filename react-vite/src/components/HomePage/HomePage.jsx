@@ -16,15 +16,19 @@ const HomePage = () => {
         <div className="homepage-container">
             <section className="section">
                 <h2>Songs</h2>
+
                 {songsStatus === "loading" && <p>Loading songs...</p>}
-                {songsError && <p>Error loading songs: {songsError}</p>}
-                <div className="list">
-                    {songs.map((song) => (
-                        <Link key={song.id} to={`/songs/${song.id}`} className="item">
-                            {song.title}
-                        </Link>
-                    ))}
-                </div>
+                {songsError && <p className="error">Error loading songs: {songsError}</p>}
+
+                {songs.length > 0 && (
+                    <div className="list">
+                        {songs.map((song) => (
+                            <Link key={song.id} to={`/songs/${song.id}`} className="item">
+                                {song.title}
+                            </Link>
+                        ))}
+                    </div>
+                )}
             </section>
         </div>
     );
