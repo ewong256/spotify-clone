@@ -104,7 +104,7 @@ const playlistReducer = (state = {}, action) => {
         },
       };
     case LOAD_PLAYLISTS:{
-        const newPlaylists = {};
+        const newPlaylists = {...state};
       action.playlists.forEach((pl) => {
         newPlaylists[pl.id] = pl;
       });

@@ -10,6 +10,11 @@ const Playlist = () => {
   console.log("Playlist ID:", playlistId); // Debugging
 
   const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.session);
+
+  // If the user is not logged in, redirect to login page
+
+  const allPlaylists = useSelector((state) => state.playlists.allPlaylists);
   const playlist = useSelector((state) => state.playlists); // Get playlist from Redux
   const [newTitle, setNewTitle] = useState("");
   const [songId, setSongId] = useState("");
