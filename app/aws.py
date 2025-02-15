@@ -31,3 +31,11 @@ def upload_file_to_s3(file, filename, content_type):
     except Exception as e:
         print("Error uploading file:", str(e))
         return None
+
+def delete_file_from_s3(file_key, bucket_name="app-academy-spotify-clone"):
+    try:
+        s3.delete_object(Bucket=bucket_name, Key=file_key)
+        return True
+    except Exception as e:
+        print(f"Error deleting file: {e}")
+        return False
