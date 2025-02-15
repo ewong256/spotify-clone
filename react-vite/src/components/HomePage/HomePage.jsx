@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchSongs } from "../../store/songs"; 
+import { fetchSongs } from "../../redux/songs";
 import { Link } from "react-router-dom";
 import "./HomePage.css";
 
@@ -10,8 +10,7 @@ const HomePage = () => {
 
     useEffect(() => {
         dispatch(fetchSongs());
-    }, [dispatch]);
-
+    }, [dispatch])
     return (
         <div className="homepage-container">
             <section className="section">
