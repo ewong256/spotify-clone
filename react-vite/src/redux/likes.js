@@ -32,14 +32,14 @@ export const fetchLikes = (songId) => async (dispatch) => {
 export const likeSongs = (songId) => async (dispatch) => {
     const res = await fetch(`/api/songs/${songId}/likes`, {method: "POST"});
     if (res.ok) {
-        dispatch(likeSongs(songId));
+        dispatch(likeSong(songId));
     }
 };
 
 export const unlikeSongs = (songId) => async (dispatch) => {
     const res = await fetch(`/api/songs/${songId}/likes`, {method: "POST"});
-    if (response.ok) {
-        dispatch(unlikeSongs(songId))
+    if (res.ok) {
+        dispatch(unlikeSong(songId))
     }
 };
 
