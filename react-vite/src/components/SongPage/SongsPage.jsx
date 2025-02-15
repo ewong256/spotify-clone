@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSongs } from "../redux/songs"; // Import the action
+import { fetchSongs } from "../../redux/songs";
 import { FaHeart, FaPlay, FaEllipsisH } from "react-icons/fa";
 import "./SongPage.css";
 
