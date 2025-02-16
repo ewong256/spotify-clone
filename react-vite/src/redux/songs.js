@@ -6,7 +6,7 @@ const ADD_SONG_SUCCESS = "songs/ADD_SONG_SUCCESS";
 const EDIT_SONG_SUCCESS = "songs/EDIT_SONG_SUCCESS";
 const DELETE_SONG_SUCCESS = "songs/DELETE_SONG_SUCCESS";
 
-
+// Action creators
 const fetchSongsStart = () => ({ type: FETCH_SONGS_START });
 const fetchSongsSuccess = (songs) => ({ type: FETCH_SONGS_SUCCESS, payload: songs });
 const fetchSongsFailure = (error) => ({ type: FETCH_SONGS_FAILURE, payload: error });
@@ -15,11 +15,22 @@ const addSongSuccess = (song) => ({ type: ADD_SONG_SUCCESS, payload: song });
 const editSongSuccess = (song) => ({ type: EDIT_SONG_SUCCESS, payload: song });
 const deleteSongSuccess = (songId) => ({ type: DELETE_SONG_SUCCESS, payload: songId });
 
+// Dynamically set API base URL based on current environment
+const API_BASE_URL = `${window.location.origin}/api`;
 
+// **Fetch Songs**
 export const fetchSongs = () => async (dispatch) => {
   dispatch(fetchSongsStart());
   try {
-    const response = await fetch("/api/songs");
+    const response = await fetch(`${API_BASE_URL}/songs`, {
+      method: "GET",
+      credentials: "include", // Required if using cookies for auth
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch songs");
+    }
+
     const data = await response.json();
     dispatch(fetchSongsSuccess(data.songs));
   } catch (error) {
@@ -30,7 +41,7 @@ export const fetchSongs = () => async (dispatch) => {
 // **Thunk to Add a Song**
 export const addSong = (songData) => async (dispatch) => {
   try {
-    const response = await fetch("/api/songs", {
+    const response = await fetch(`${API_BASE_URL}/songs`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(songData),
@@ -50,7 +61,7 @@ export const addSong = (songData) => async (dispatch) => {
 // **Thunk to Edit a Song**
 export const editSong = (songId, updatedData) => async (dispatch) => {
   try {
-    const response = await fetch(`/api/songs/${songId}`, {
+    const response = await fetch(`${API_BASE_URL}/songs/${songId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedData),
@@ -70,7 +81,7 @@ export const editSong = (songId, updatedData) => async (dispatch) => {
 // **Thunk to Delete a Song**
 export const deleteSong = (songId) => async (dispatch) => {
   try {
-    const response = await fetch(`/api/songs/${songId}`, {
+    const response = await fetch(`${API_BASE_URL}/songs/${songId}`, {
       method: "DELETE",
     });
 
