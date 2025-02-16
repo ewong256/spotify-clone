@@ -4,6 +4,7 @@ import LoginFormPage from '../components/LoginFormPage';
 import SignupFormPage from '../components/SignupFormPage';
 import Layout from './Layout';
 import SongsPage from '../components/SongPage/SongsPage';
+import AlbumPage from '../components/AlbumPage/AlbumPage';
 
 
 export const router = createBrowserRouter([
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: "songs",  // ✅ Added SongsPage inside Layout
         element: <SongsPage />,
+      },
+      {
+        path: "album/:albumId",
+        element: <AlbumPage />,
       },
       
     ],
