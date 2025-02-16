@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, URLField, SubmitField
-from wtforms.validators import DataRequired, Length, URL
+from wtforms import StringField, IntegerField, FileField, SubmitField
+from wtforms.validators import DataRequired, Length
 
 class AlbumForm(FlaskForm):
     title = StringField("Title", validators=[
@@ -10,9 +10,7 @@ class AlbumForm(FlaskForm):
 
     user_id = IntegerField("User ID", validators=[DataRequired()])
 
-    image_url = URLField("Image URL", validators=[
-        Length(max=500, message="Image URL cannot contain more than 500 characters"),
-        URL(require_tld=True, message="Must be a valid URL")
-    ])
+    # Change URLField to FileField for file uploads
+    image = FileField("Upload Image")
 
     submit = SubmitField("Create Album")

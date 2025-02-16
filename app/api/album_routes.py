@@ -47,7 +47,7 @@ def get_album(album_id):
 @login_required
 def create_album():
     """
-    Creates an album with an optional image and audio file uploaded to S3.
+    Create a new album with an optional image uploaded to S3.
     """
     data = request.form  # Use form-data for file uploads
 
@@ -55,40 +55,27 @@ def create_album():
         return jsonify({"error": "Title is required"}), 400
 
     image_url = None
-    audio_url = None
 
-    # Upload Image
+    # Check if an image is uploaded
     if "image" in request.files:
         image_file = request.files["image"]
-        if not allowed_file(image_file.filename, ALLOWED_IMAGE_EXTENSIONS):
+        if not allowed_file(image_file.filename):
             return jsonify({"error": "Invalid image format"}), 400
 
+        # Secure filename and generate unique name
         image_filename = secure_filename(generate_unique_filename(image_file.filename))
         content_type = image_file.content_type if image_file.content_type else "image/jpeg"
 
+        # Upload to S3
         image_url = upload_file_to_s3(image_file, f"albums/images/{image_filename}", content_type)
         if not image_url:
             return jsonify({"error": "Failed to upload image"}), 500
 
-    # Upload Audio
-    if "audio" in request.files:
-        audio_file = request.files["audio"]
-        if not allowed_file(audio_file.filename, ALLOWED_AUDIO_EXTENSIONS):
-            return jsonify({"error": "Invalid audio format"}), 400
-
-        audio_filename = secure_filename(generate_unique_filename(audio_file.filename))
-        content_type = audio_file.content_type if audio_file.content_type else "audio/mpeg"
-
-        audio_url = upload_file_to_s3(audio_file, f"albums/audios/{audio_filename}", content_type)
-        if not audio_url:
-            return jsonify({"error": "Failed to upload audio"}), 500
-
-    # Create Album
+    # Create Album entry
     new_album = Album(
         title=data["title"],
         user_id=current_user.id,
-        image_url=image_url,
-        audio_url=audio_url
+        image_url=image_url  # Store S3 URL in database
     )
 
     db.session.add(new_album)
