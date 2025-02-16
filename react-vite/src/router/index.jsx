@@ -4,6 +4,7 @@ import LoginFormPage from '../components/LoginFormPage';
 import SignupFormPage from '../components/SignupFormPage';
 import Layout from './Layout';
 import SongsPage from '../components/SongPage/SongsPage';
+import UserProfile from '../components/UserDetails/UserDetails';
 
 
 export const router = createBrowserRouter([
@@ -26,7 +27,11 @@ export const router = createBrowserRouter([
         path: "songs",  // ✅ Added SongsPage inside Layout
         element: <SongsPage />,
       },
-      
+      {
+        path:"/user/:userId/profile",
+        element: <UserProfile />
+      }
+
     ],
   },
 ]);
