@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSongs, addSong, editSong, deleteSong } from "../../redux/songs";
 import { FaHeart, FaPlay, FaEllipsisH, FaTrash, FaEdit } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";  // For redirect
 import "./SongPage.css";
 
 const SongsPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();  // Initialize navigation for redirect
   const { songs, status, error } = useSelector((state) => state.songs);
   const currentUser = useSelector((state) => state.session.user); // Check for authenticated user
 
@@ -15,6 +17,13 @@ const SongsPage = () => {
   useEffect(() => {
     dispatch(fetchSongs());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!currentUser) {
+      // Redirect to login page if the user is not authenticated
+      navigate('/login');
+    }
+  }, [currentUser, navigate]);
 
   const handleAddSong = (e) => {
     e.preventDefault();
