@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSongs } from "../../redux/songs";
 import { FaHeart, FaPlay, FaEllipsisH } from "react-icons/fa";
+import CreateSong from "../CreateSong/createSong";
 import "./SongPage.css";
 
 const SongsPage = () => {
   const dispatch = useDispatch();
   const { songs, status, error } = useSelector((state) => state.songs);
+  const [showCreateForm, setShowCreateForm] = useState(false); 
 
   useEffect(() => {
     dispatch(fetchSongs());
@@ -18,6 +20,18 @@ const SongsPage = () => {
   return (
     <div className="p-8 bg-gray-900 min-h-screen text-white">
       <h2 className="text-3xl font-bold mb-6">All Songs</h2>
+
+      {/* Button to toggle CreateSong form */}
+      <button
+        className="mb-4 p-2 bg-green-500 text-white rounded"
+        onClick={() => setShowCreateForm(true)} 
+      >
+        Add New Song
+      </button>
+
+      {/* Conditionally render the CreateSong form */}
+      {showCreateForm && <CreateSong />}
+
       <table className="w-full text-left">
         <thead>
           <tr className="border-b border-gray-700">
