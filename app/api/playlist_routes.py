@@ -21,16 +21,25 @@ def create_playlist():
     return jsonify({"message": "Playlist created successfully", "playlist": new_playlist.id}), 201
 
 # GET All Playlists for a User
-@playlist_routes.route('/', methods=['GET'])
+# @playlist_routes.route('/', methods=['GET'])
+# @login_required
+# def get_user_playlists():
+#     playlists = Playlist.query.all()  #Playlist.query.filter_by(user_id=current_user.id).all() [IF YOU WANT ONLY THE USER TO SEE THEIR PLAYLIST]
+#     return jsonify([{
+#         "id": playlist.id,
+#         "title": playlist.title,
+#         "image_url": playlist.image_url,
+#         "user_id": playlist.user_id #Optionsl. To show userID of Creator of Playlist
+#     } for playlist in playlists])
+
+@playlist_routes.route("/", methods=["GET"])
 @login_required
-def get_user_playlists():
-    playlists = Playlist.query.all()  #Playlist.query.filter_by(user_id=current_user.id).all() [IF YOU WANT ONLY THE USER TO SEE THEIR PLAYLIST]
-    return jsonify([{
-        "id": playlist.id,
-        "title": playlist.title,
-        "image_url": playlist.image_url,
-        "user_id": playlist.user_id #Optionsl. To show userID of Creator of Playlist
-    } for playlist in playlists])
+def playlists():
+    """
+    Query for all playlists and returns them in a list of playlist dictionaries
+    """
+    playlists = Playlist.query.filter(Playlist.user_id == current_user.id)
+    return {"playlists": [playlist.to_dict() for playlist in playlists]}
 
 # GET a Specific Playlist
 @playlist_routes.route('/<int:playlist_id>', methods=['GET'])

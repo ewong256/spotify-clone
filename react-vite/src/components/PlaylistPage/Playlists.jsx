@@ -21,11 +21,7 @@ const Playlist = () => {
   // }, [dispatch, playlistId]);
 
   useEffect(() => {
-    if (playlistId) {
-      dispatch(thunkFetchPlaylist(playlistId));
-    } else {
       dispatch(thunkFetchAllPlaylists());
-    }
   }, [dispatch, playlistId]);
 
   // Handle renaming the playlist

@@ -45,10 +45,11 @@ export const thunkFetchPlaylist = (playlistId) => async (dispatch) => {
 
 export const thunkFetchAllPlaylists = () => async (dispatch) => {
   const res = await fetch("/api/playlists");
+  const data = await res.json();
   if (res.ok) {
-    const playlists = await res.json();
-    dispatch(loadPlaylists(playlists));
+    dispatch(loadPlaylists(data.playlists));
   }
+  return res
 };
 
 export const thunkRenamePlaylist = (playlistId, title) => async (dispatch) => {
@@ -104,11 +105,11 @@ const playlistReducer = (state = {}, action) => {
         },
       };
     case LOAD_PLAYLISTS:{
-        const newPlaylists = {};
+        const newState = {};
       action.playlists.forEach((pl) => {
-        newPlaylists[pl.id] = pl;
+        newState[pl.id] = pl;
       });
-      return newPlaylists
+      return newState
     }
     case ADD_SONG:
       return {
