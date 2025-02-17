@@ -7,22 +7,29 @@ import { router } from "./router";
 import * as sessionActions from "./redux/session";
 import "./index.css";
 
+// Initialize the store
 const store = configureStore();
+
+// Wrap in a React component
+const App = () => {
+  useEffect(() => {
+    // Dispatching thunkAuthenticate inside the component
+    store.dispatch(sessionActions.thunkAuthenticate());
+  }, []);
+
+  return (
+    <React.StrictMode>
+      <ReduxProvider store={store}>
+        <RouterProvider router={router} />
+      </ReduxProvider>
+    </React.StrictMode>
+  );
+};
 
 if (import.meta.env.MODE !== "production") {
   window.store = store;
   window.sessionActions = sessionActions;
 }
 
-useEffect(() => {
-  // Dispatch thunk to check for user authentication status
-  store.dispatch(sessionActions.thunkAuthenticate());
-}, []);  // <-- Adding useEffect here
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <ReduxProvider store={store}>
-      <RouterProvider router={router} />
-    </ReduxProvider>
-  </React.StrictMode>
-);
+// Render the App component
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
