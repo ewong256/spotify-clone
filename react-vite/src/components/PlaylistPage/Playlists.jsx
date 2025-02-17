@@ -1,64 +1,31 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { thunkFetchPlaylist, thunkRenamePlaylist, thunkAddSong, thunkRemoveSong, thunkFetchAllPlaylists } from "../../redux/playlistReducer";
+import { thunkFetchPlaylist, thunkFetchAllPlaylists } from "../../redux/playlistReducer";
 import { useParams } from "react-router-dom";
 
-
-
 const Playlist = () => {
-  const { playlistId } = useParams(); // Get ID from URL
-  console.log("Playlist ID:", playlistId); // Debugging
-
+  const { playlistId } = useParams();
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.session);
-
-  // If the user is not logged in, redirect to login page
-
-  const allPlaylists = useSelector((state) => state.playlists.allPlaylists);
-  const playlist = useSelector((state) => state.playlists); // Get playlist from Redux
-  const [newTitle, setNewTitle] = useState("");
-  const [songId, setSongId] = useState("");
-  const [error, setError] = useState("");
-
-  // Fetch playlist details when component mounts
-  // useEffect(() => {
-  //   dispatch(thunkFetchPlaylist(playlistId));
-  // }, [dispatch, playlistId]);
+  
+  // Select playlists data from the Redux store
+  const allPlaylists = useSelector((state) => state.playlists);
+  const playlist = allPlaylists[playlistId];
 
   useEffect(() => {
     if (playlistId) {
-      dispatch(thunkFetchPlaylist(playlistId));
+      dispatch(thunkFetchPlaylist(playlistId)); // Fetch specific playlist when playlistId is available
     } else {
-      dispatch(thunkFetchAllPlaylists());
+      dispatch(thunkFetchAllPlaylists()); // Fetch all playlists if no playlistId
     }
-  }, [dispatch, playlistId]);
+  }, [dispatch, playlistId]); // Effect runs only when playlistId changes
 
-  // Handle renaming the playlist
-  const renamePlaylist = async () => {
-    const success = await dispatch(thunkRenamePlaylist(playlistId, newTitle));
-    if (!success) setError("Failed to update playlist title.");
-  };
-
-  // Handle adding a song
-  const addSong = async () => {
-    const success = await dispatch(thunkAddSong(playlistId, songId));
-    if (!success) setError("Failed to add song.");
-  };
-
-  // Handle removing a song
-  const removeSong = async (songId) => {
-    const success = await dispatch(thunkRemoveSong(playlistId, songId));
-    if (!success) setError("Failed to remove song.");
-  };
-
-  // if (!playlist) return <p>Loading playlist...</p>;
-
-
-  return (
-    <div>
-        <h2>All Playlists</h2>
+  if (!playlistId) {
+    // Render all playlists if on the /playlists route
+    return (
+      <div>
+        <h2>Your Playlists</h2>
         <ul>
-          {Object.values(playlist).map((pl) => (
+          {Object.values(allPlaylists).map((pl) => (
             <li key={pl.id}>
               <a href={`/playlists/${pl.id}`}>{pl.title}</a>
             </li>
@@ -66,8 +33,20 @@ const Playlist = () => {
         </ul>
       </div>
     );
+  }
 
+  if (playlist) {
+    // Render individual playlist if on the /playlists/:id route
+    return (
+      <div>
+        <h2>{playlist.title}</h2>
+        <p>Number of songs: {playlist.songs.length}</p>
+        {/* Add more playlist details, rename, add/remove songs */}
+      </div>
+    );
+  }
 
+  return <p>Loading...</p>;
 };
 
 export default Playlist;
