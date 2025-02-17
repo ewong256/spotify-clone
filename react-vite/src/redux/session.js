@@ -13,13 +13,13 @@ const removeUser = () => ({
 
 // Thunk to authenticate the user by checking if a token exists in localStorage
 export const thunkAuthenticate = () => async (dispatch) => {
-  // Check if token is present in localStorage
   const token = localStorage.getItem('authToken');
+
   if (token) {
-    // If token exists, we assume the user is authenticated
+    // Make a request to the backend to validate the session token
     const response = await fetch("/api/auth/", {
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the headers if using token-based auth
+        'Authorization': `Bearer ${token}` // Include token in the request headers
       }
     });
 
@@ -32,7 +32,7 @@ export const thunkAuthenticate = () => async (dispatch) => {
       // Dispatch setUser to store user info if authenticated
       dispatch(setUser(data));
     } else {
-      // If the response is not ok, clear the token and user state
+      // If the response is not ok (token is invalid or expired), clear the token and user state
       localStorage.removeItem('authToken');
       dispatch(removeUser());
     }
@@ -52,6 +52,7 @@ export const thunkLogin = (credentials) => async (dispatch) => {
 
   if (response.ok) {
     const data = await response.json();
+    localStorage.setItem('authToken', data.token); // Save token in localStorage after login
     dispatch(setUser(data));
   } else if (response.status < 500) {
     const errorMessages = await response.json();
@@ -71,6 +72,7 @@ export const thunkSignup = (user) => async (dispatch) => {
 
   if (response.ok) {
     const data = await response.json();
+    localStorage.setItem('authToken', data.token); // Save token in localStorage after signup
     dispatch(setUser(data));
   } else if (response.status < 500) {
     const errorMessages = await response.json();
@@ -83,6 +85,7 @@ export const thunkSignup = (user) => async (dispatch) => {
 // Thunk for logout action
 export const thunkLogout = () => async (dispatch) => {
   await fetch("/api/auth/logout");
+  localStorage.removeItem('authToken'); // Remove token from localStorage on logout
   dispatch(removeUser());
 };
 
