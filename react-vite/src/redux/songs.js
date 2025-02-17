@@ -16,27 +16,28 @@ const editSongSuccess = (song) => ({ type: EDIT_SONG_SUCCESS, payload: song });
 const deleteSongSuccess = (songId) => ({ type: DELETE_SONG_SUCCESS, payload: songId });
 
 // Dynamically set API base URL based on current environment
-const API_BASE_URL = `${window.location.origin}/api`;
+const API_BASE_URL = "http://localhost:5173/api";
+
 
 // **Fetch Songs**
 export const fetchSongs = () => async (dispatch) => {
-  dispatch(fetchSongsStart());
-  try {
-    const response = await fetch(`${API_BASE_URL}/songs`, {
-      method: "GET",
-      credentials: "include", // Required if using cookies for auth
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch songs");
+    dispatch(fetchSongsStart());
+    try {
+      const response = await fetch(`${API_BASE_URL}/songs`, {
+        method: "GET",
+        credentials: "include", // Required if using cookies for auth
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to fetch songs");
+      }
+  
+      const data = await response.json();
+      dispatch(fetchSongsSuccess(data.songs));
+    } catch (error) {
+      dispatch(fetchSongsFailure(error.message));
     }
-
-    const data = await response.json();
-    dispatch(fetchSongsSuccess(data.songs));
-  } catch (error) {
-    dispatch(fetchSongsFailure(error.message));
-  }
-};
+  };
 
 // **Thunk to Add a Song**
 export const addSong = (songData) => async (dispatch) => {
