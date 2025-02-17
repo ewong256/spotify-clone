@@ -2,16 +2,37 @@ const LOAD_PLAYLIST = "playlists/loadPlaylist";
 const REMOVE_SONG = "playlists/removeSong";
 const ADD_SONG = "playlists/addSong";
 const UPDATE_PLAYLIST = "playlists/updatePlaylist";
-const LOAD_PLAYLISTS = "playlists/loadPlaylists";
+const LOAD_PLAYLISTS = "playlists/loadPlaylists"
 
 const loadPlaylist = (playlist) => ({
   type: LOAD_PLAYLIST,
   playlist,
 });
 
+
 const loadPlaylists = (playlists) => ({
   type: LOAD_PLAYLISTS,
   playlists,
+});
+
+
+
+const removeSongFromPlaylist = (playlistId, songId) => ({
+  type: REMOVE_SONG,
+  playlistId,
+  songId,
+});
+
+const addSongToPlaylist = (playlistId, song) => ({
+  type: ADD_SONG,
+  playlistId,
+  song,
+});
+
+const updatePlaylist = (playlistId, title) => ({
+  type: UPDATE_PLAYLIST,
+  playlistId,
+  title,
 });
 
 export const thunkFetchPlaylist = (playlistId) => async (dispatch) => {
@@ -24,10 +45,58 @@ export const thunkFetchPlaylist = (playlistId) => async (dispatch) => {
 
 export const thunkFetchAllPlaylists = () => async (dispatch) => {
   const res = await fetch("/api/playlists");
+  console.log("after fetch:" + res)
   if (res.ok) {
     const playlists = await res.json();
+    console.log("json"+res.json);
     dispatch(loadPlaylists(playlists));
   }
+};
+
+export const thunkRenamePlaylist = (playlistId, title) => async (dispatch) => {
+  const token = localStorage.getItem("token"); // Or use Redux state if you store the user session token there
+  const response = await fetch(`/api/playlists/${playlistId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`, // Add the token here
+    },
+    body: JSON.stringify({ title }),
+  });
+  
+  if (response.ok) {
+    dispatch(updatePlaylist(playlistId, title));
+    return true;
+  }
+  return false;
+};
+
+
+export const thunkAddSong = (playlistId, songId) => async (dispatch) => {
+  const response = await fetch(`/api/playlists/${playlistId}/songs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ song_id: songId }),
+  });
+
+  if (response.ok) {
+    const newSong = await response.json();
+    dispatch(addSongToPlaylist(playlistId, newSong));
+    return true;
+  }
+  return false;
+};
+
+export const thunkRemoveSong = (playlistId, songId) => async (dispatch) => {
+  const response = await fetch(`/api/playlists/${playlistId}/songs/${songId}`, {
+    method: "DELETE",
+  });
+
+  if (response.ok) {
+    dispatch(removeSongFromPlaylist(playlistId, songId));
+    return true;
+  }
+  return false;
 };
 
 const playlistReducer = (state = {}, action) => {
@@ -42,12 +111,12 @@ const playlistReducer = (state = {}, action) => {
           title: action.title,
         },
       };
-    case LOAD_PLAYLISTS: {
-      const newPlaylists = { ...state };
+    case LOAD_PLAYLISTS:{
+        const newPlaylists = {...state};
       action.playlists.forEach((pl) => {
         newPlaylists[pl.id] = pl;
       });
-      return newPlaylists;
+      return newPlaylists
     }
     case ADD_SONG:
       return {

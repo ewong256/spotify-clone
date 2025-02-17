@@ -4,12 +4,12 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from flask_login import LoginManager
-from .models import db, User
+from .models import db, User, Playlist, Song  # Import models for Playlist and Song
 from .api.user_routes import user_routes
 from .api.auth_routes import auth_routes
 from .seeds import seed_commands
 from .config import Config
-from .api.playlist_routes import playlist_routes #ADDED FOR PLAYLIST ROUTE
+from .api.playlist_routes import playlist_routes
 from .api.album_routes import album_routes
 from .api.song_routes import song_routes
 from .api.like_routes import like_routes
@@ -89,16 +89,58 @@ def react_root(path):
         return app.send_from_directory('public', 'favicon.ico')
     return app.send_static_file('index.html')
 
-#ADDED FOR PLAYLIST
+# ADDED FOR PLAYLIST
 app.register_blueprint(playlist_routes, url_prefix='/api/playlists')
 
+# Playlist routes:
+@app.route('/api/playlists/<int:playlist_id>', methods=['PUT'])
+def update_playlist(playlist_id):
+    """
+    Renames a playlist
+    """
+    data = request.get_json()
+    new_title = data.get('title')
+
+    playlist = Playlist.query.get(playlist_id)
+    if playlist is None:
+        return {'error': 'Playlist not found'}, 404
+
+    # You should check if the user has permission to rename the playlist here.
+    # For example, if the playlist is owned by the current logged-in user.
+    if playlist.user_id != session.get('user_id'):  # Assuming session stores user ID
+        return {'error': 'Unauthorized'}, 403
+
+    playlist.title = new_title
+    db.session.commit()
+
+    return {'playlist': playlist.to_dict()}
+
+@app.route('/api/playlists/<int:playlist_id>/songs/<int:song_id>', methods=['DELETE'])
+def remove_song_from_playlist(playlist_id, song_id):
+    """
+    Removes a song from a playlist
+    """
+    playlist = Playlist.query.get(playlist_id)
+    if playlist is None:
+        return {'error': 'Playlist not found'}, 404
+
+    # You should check if the user has permission to remove songs from the playlist.
+    if playlist.user_id != session.get('user_id'):  # Assuming session stores user ID
+        return {'error': 'Unauthorized'}, 403
+
+    song = Song.query.get(song_id)
+    if song is None:
+        return {'error': 'Song not found'}, 404
+
+    playlist.songs.remove(song)  # Removing the song from the playlist
+    db.session.commit()
+
+    return {'message': 'Song removed successfully'}
+
+# Register other blueprints
 app.register_blueprint(album_routes, url_prefix='/api/albums')
-
 app.register_blueprint(song_routes, url_prefix='/api/songs')
-
 app.register_blueprint(like_routes, url_prefix='/api/songs')
-
-
 
 @app.errorhandler(404)
 def not_found(e):
