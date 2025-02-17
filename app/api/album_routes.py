@@ -5,6 +5,8 @@ from app import db
 from app.aws import upload_file_to_s3, delete_file_from_s3
 from werkzeug.utils import secure_filename
 import uuid
+from app.models import Album, AlbumSong
+
 
 album_routes = Blueprint('albums', __name__)
 
@@ -35,12 +37,29 @@ def get_albums():
     return jsonify([album.to_dict() for album in albums])
 
 # Get a single album by ID
+# Get a single album by ID
 @album_routes.route('/<int:album_id>', methods=['GET'])
 def get_album(album_id):
+    # Fetch the album by its ID
     album = Album.query.get(album_id)
+
     if not album:
         return jsonify({"error": "Album not found"}), 404
-    return jsonify(album.to_dict())
+    
+    # Fetch the associated songs via the AlbumSong table
+    album_songs = AlbumSong.query.filter(AlbumSong.album_id == album_id).all()
+
+    # Create a list of songs based on the relationship
+    songs = [album_song.song.to_dict() for album_song in album_songs]
+
+    # Return the album data with the associated songs
+    return jsonify({
+        'id': album.id,
+        'title': album.title,
+        'user_id': album.user_id,
+        'image_url': album.image_url,
+        'songs': songs  # Add the list of songs
+    })
 
 # Create new album
 @album_routes.route('/', methods=['POST'])

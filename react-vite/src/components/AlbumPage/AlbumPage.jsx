@@ -39,7 +39,6 @@ const AlbumPage = () => {
         </div>
         <div className="album-info">
           <h2>{albumData.title}</h2>
-          <p>{albumData.artist_name} • {albumData.year} • {albumData.num_songs} songs</p>
         </div>
       </div>
 
@@ -48,28 +47,9 @@ const AlbumPage = () => {
         <button className="add-btn">➕</button>
         <button className="more-btn">⋮</button>
       </div>
-
-      <div className="tracklist">
-        <div className="track-header">
-          <span>#</span>
-          <span>Title</span>
-          <span>Duration</span>
-        </div>
-        {albumData.tracks.map((track, index) => (
-          <div key={track.id} className="track-item">
-            <span>{index + 1}</span>
-            <span>{track.title}</span>
-            <span>{track.duration}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="album-footer">
-        <p>Published: {albumData.date_published}</p>
-        <h3>More by {albumData.artist_name}</h3>
-      </div>
     </div>
   );
 };
 
 export default AlbumPage;
+  
