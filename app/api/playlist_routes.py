@@ -72,7 +72,7 @@ def get_user_playlists():
     """
     Get all playlists for the current user.
     """
-    playlists = Playlist.query.filter_by(user_id=current_user.id).all()
+    playlists = Playlist.query.filter(Playlist.user_id == current_user.id).all()
     return jsonify([playlist.to_dict() for playlist in playlists]), 200
 
 
