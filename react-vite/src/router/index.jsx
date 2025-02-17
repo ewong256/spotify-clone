@@ -27,10 +27,7 @@ export const router = createBrowserRouter([
         path: "songs",  // ✅ Added SongsPage inside Layout
         element: <SongsPage />,
       },
-      {
-        path: "/songs/:songId/likes",
-        element: <LikeButton />,
-      }
+      
 
     ],
   },
