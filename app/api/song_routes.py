@@ -5,7 +5,7 @@ from app.models import db, Song
 song_routes = Blueprint("songs", __name__, url_prefix="/api/songs")
 
 
-@song_routes.route("/", methods=["GET"])
+@song_routes.route(" ", methods=["GET"])
 def get_all_songs():
     """
     Get all songs and return them as a list of dictionaries.
@@ -25,7 +25,7 @@ def get_song(id):
     return jsonify(song.to_dict()), 200
 
 
-@song_routes.route("/", methods=["POST"])
+@song_routes.route(" ", methods=["POST"])
 @login_required
 def create_song():
     """
