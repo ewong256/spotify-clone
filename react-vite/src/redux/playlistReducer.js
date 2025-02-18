@@ -2,20 +2,17 @@ const LOAD_PLAYLIST = "playlists/loadPlaylist";
 const REMOVE_SONG = "playlists/removeSong";
 const ADD_SONG = "playlists/addSong";
 const UPDATE_PLAYLIST = "playlists/updatePlaylist";
-const LOAD_PLAYLISTS = "playlists/loadPlaylists"
+const LOAD_PLAYLISTS = "playlists/loadPlaylists";
 
 const loadPlaylist = (playlist) => ({
   type: LOAD_PLAYLIST,
   playlist,
 });
 
-
 const loadPlaylists = (playlists) => ({
   type: LOAD_PLAYLISTS,
   playlists,
 });
-
-
 
 const removeSongFromPlaylist = (playlistId, songId) => ({
   type: REMOVE_SONG,
@@ -45,10 +42,8 @@ export const thunkFetchPlaylist = (playlistId) => async (dispatch) => {
 
 export const thunkFetchAllPlaylists = () => async (dispatch) => {
   const res = await fetch("/api/playlists");
-  console.log("after fetch:" + res)
   if (res.ok) {
     const playlists = await res.json();
-    console.log("json"+res.json);
     dispatch(loadPlaylists(playlists));
   }
 };
@@ -70,7 +65,6 @@ export const thunkRenamePlaylist = (playlistId, title) => async (dispatch) => {
   }
   return false;
 };
-
 
 export const thunkAddSong = (playlistId, songId) => async (dispatch) => {
   const response = await fetch(`/api/playlists/${playlistId}/songs`, {
@@ -111,12 +105,12 @@ const playlistReducer = (state = {}, action) => {
           title: action.title,
         },
       };
-    case LOAD_PLAYLISTS:{
-        const newPlaylists = {...state};
+    case LOAD_PLAYLISTS: {
+      const newPlaylists = { ...state };
       action.playlists.forEach((pl) => {
         newPlaylists[pl.id] = pl;
       });
-      return newPlaylists
+      return newPlaylists;
     }
     case ADD_SONG:
       return {

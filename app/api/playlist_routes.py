@@ -5,7 +5,7 @@ from ..models import db, Playlist, PlaylistSong, Song
 playlist_routes = Blueprint('playlist_routes', __name__)
 
 # POST/CREATE a Playlist
-@playlist_routes.route('/', methods=['POST'])
+@playlist_routes.route('', methods=['POST'])
 @login_required
 def create_playlist():
     data = request.json
@@ -21,7 +21,7 @@ def create_playlist():
     return jsonify({"message": "Playlist created successfully", "playlist": new_playlist.id}), 201
 
 # GET All Playlists for a User
-@playlist_routes.route('/', methods=['GET'])
+@playlist_routes.route('', methods=['GET'])
 @login_required
 def get_user_playlists():
     playlists = Playlist.query.all()  #Playlist.query.filter_by(user_id=current_user.id).all() [IF YOU WANT ONLY THE USER TO SEE THEIR PLAYLIST]
