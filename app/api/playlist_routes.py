@@ -24,12 +24,12 @@ def create_playlist():
 @playlist_routes.route('', methods=['GET'])
 @login_required
 def get_user_playlists():
-    playlists = Playlist.query.all()  #Playlist.query.filter_by(user_id=current_user.id).all() [IF YOU WANT ONLY THE USER TO SEE THEIR PLAYLIST]
+    playlists = Playlist.query.all()
     return jsonify([{
         "id": playlist.id,
         "title": playlist.title,
         "image_url": playlist.image_url,
-        "user_id": playlist.user_id #Optionsl. To show userID of Creator of Playlist
+        "user_id": playlist.user_id
     } for playlist in playlists])
 
 # GET a Specific Playlist
@@ -44,11 +44,19 @@ def get_playlist(playlist_id):
         "album": ps.song.album
     } for ps in playlist.songs]
 
+    available_songs = Song.query.all()
+    available_songs_list = [{
+        "id": song.id,
+        "title": song.title,
+        "artist": song.artist
+    } for song in available_songs]
+
     return jsonify({
         "id": playlist.id,
         "title": playlist.title,
         "image_url": playlist.image_url,
-        "songs": songs
+        "songs": songs,
+        "available_songs": available_songs_list
     })
 
 # UPDATE/PUT Playlist
@@ -58,7 +66,6 @@ def update_playlist(playlist_id):
     data = request.json
     playlist = Playlist.query.get_or_404(playlist_id)
 
-    # Ensure the current user is the owner of the playlist
     if playlist.user_id != current_user.id:
         return jsonify({"error": "You do not have permission to update this playlist"}), 403
 
@@ -74,7 +81,6 @@ def update_playlist(playlist_id):
 def delete_playlist(playlist_id):
     playlist = Playlist.query.get_or_404(playlist_id)
 
-    # Ensure the current user is the owner of the playlist
     if playlist.user_id != current_user.id:
         return jsonify({"error": "You do not have permission to delete this playlist"}), 403
 
@@ -83,18 +89,46 @@ def delete_playlist(playlist_id):
 
     return jsonify({"message": "Playlist deleted"})
 
-# ADD Song to Playlist
+# ADD Song to Playlist (Only if the Song Exists in the Songs Table)
 @playlist_routes.route('/<int:playlist_id>/songs', methods=['POST'])
 @login_required
 def add_song_to_playlist(playlist_id):
     data = request.json
     song_id = data.get('song_id')
 
+    if not song_id:
+        return jsonify({"error": "Missing song ID"}), 400
+
+    song = Song.query.get(song_id)
+    if not song:
+        return jsonify({"error": "Song not found"}), 404
+
+    existing_entry = PlaylistSong.query.filter_by(playlist_id=playlist_id, song_id=song_id).first()
+    if existing_entry:
+        return jsonify({"error": "Song already in playlist"}), 400
+
     new_entry = PlaylistSong(playlist_id=playlist_id, song_id=song_id)
     db.session.add(new_entry)
     db.session.commit()
 
-    return jsonify({"message": "Song added to playlist"})
+    # Fetch updated playlist with all songs
+    playlist = Playlist.query.get(playlist_id)
+    songs = [{
+        "id": ps.song.id,
+        "title": ps.song.title,
+        "artist": ps.song.artist,
+        "album": ps.song.album
+    } for ps in playlist.songs]
+
+    return jsonify({
+        "message": "Song added to playlist",
+        "playlist": {
+            "id": playlist.id,
+            "title": playlist.title,
+            "songs": songs
+        }
+    }), 201
+
 
 # REMOVE Song from Playlist
 @playlist_routes.route('/<int:playlist_id>/songs/<int:song_id>', methods=['DELETE'])

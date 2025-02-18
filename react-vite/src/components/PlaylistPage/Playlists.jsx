@@ -20,7 +20,7 @@ const Playlist = () => {
 
   useEffect(() => {
     if (currentUser?.id) {
-      dispatch(thunkFetchAllPlaylists());
+      dispatch(thunkFetchAllPlaylists());  // Fetch all playlists
     }
   }, [dispatch, currentUser]);
 
@@ -45,7 +45,8 @@ const Playlist = () => {
 
   return (
     <div>
-      {!isPlaylistPage && (
+      {/* Render links to playlists only if we're on the /playlists page */}
+      {location.pathname === "/playlists" && (
         <>
           <h2>All Playlists</h2>
           <ul>
@@ -56,14 +57,21 @@ const Playlist = () => {
             ))}
           </ul>
 
-          <h2>My Playlists</h2>
-          <ul>
-            {Object.values(playlists).filter((pl) => pl.user_id === currentUser?.id).map((pl) => (
-              <li key={pl.id}>
-                <a href={`/playlists/${pl.id}`}>{pl.title}</a>
-              </li>
-            ))}
-          </ul>
+          {/* Show only current user's playlists */}
+          {currentUser && (
+            <>
+              <h2>My Playlists</h2>
+              <ul>
+                {Object.values(playlists)
+                  .filter((pl) => pl.user_id === currentUser.id)
+                  .map((pl) => (
+                    <li key={pl.id}>
+                      <a href={`/playlists/${pl.id}`}>{pl.title}</a>
+                    </li>
+                  ))}
+              </ul>
+            </>
+          )}
         </>
       )}
 
@@ -97,14 +105,6 @@ const Playlist = () => {
                         <li key={song.id}>
                           {song.title} - {song.artist}
                           <button onClick={() => addSong(song.id)}>Add</button>
-                        </li>
-                      ))}
-                    </ul>
-                    <h4>Your Songs</h4>
-                    <ul>
-                      {playlist.user_songs?.map((song) => (
-                        <li key={song.id}>
-                          {song.title} - {song.artist}
                         </li>
                       ))}
                     </ul>
