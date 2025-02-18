@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSongs } from "../../redux/songs";
 import { FaHeart, FaPlay, FaEllipsisH, FaEdit } from "react-icons/fa";
-import CreateSong from "../CreateSong/CreateSong.jsx";
-import UpdateSong from "../UpdateSong/UpdateSong.jsx";
+import CreateSong from "../CreateSong/createSong.jsx";
+import UpdateSong from "../UpdateSong/updateSong.jsx";
 import "../SongPage/SongPage.css";
 
 const SongsPage = () => {
@@ -23,6 +23,7 @@ const SongsPage = () => {
     <div className="p-8 bg-gray-900 min-h-screen text-white">
       <h2 className="text-3xl font-bold mb-6">All Songs</h2>
 
+      {/* Create Song Button */}
       <button
         className="mb-4 p-2 bg-green-500 text-white rounded"
         onClick={() => setShowCreateForm(true)}
@@ -30,7 +31,14 @@ const SongsPage = () => {
         Add New Song
       </button>
 
-      {showCreateForm && <CreateSong />}
+      {/* Render Create Song Form */}
+      {showCreateForm && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <CreateSong onClose={() => setShowCreateForm(false)} />
+          </div>
+        </div>
+      )}
 
       <table className="w-full text-left">
         <thead>
@@ -67,10 +75,11 @@ const SongsPage = () => {
         </tbody>
       </table>
 
+      {/* Render Update Song Form */}
       {editingSong && (
         <div className="modal-overlay">
           <div className="modal">
-            <UpdateSong song={editingSong} closeModal={() => setEditingSong(null)} />
+            <UpdateSong song={editingSong} onClose={() => setEditingSong(null)} />
           </div>
         </div>
       )}
