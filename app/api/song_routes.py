@@ -5,7 +5,7 @@ from app.aws import upload_file_to_s3, delete_file_from_s3
 from werkzeug.utils import secure_filename
 import uuid
 
-song_routes = Blueprint("songs", __name__, url_prefix="/api/songs")
+song_routes = Blueprint("songs", __name__)
 
 # Allowed file extensions
 ALLOWED_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "gif"}

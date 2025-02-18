@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSongs } from "../../redux/songs";
 import { FaHeart, FaPlay, FaEllipsisH } from "react-icons/fa";
+import LikeButton from "../Likes/likes";
 import "./SongPage.css";
 
 const SongsPage = () => {
@@ -35,9 +36,7 @@ const SongsPage = () => {
                 <button className="mr-2 hover:text-green-400">
                   <FaPlay />
                 </button>
-                <button className="mr-2 hover:text-red-400">
-                  <FaHeart />
-                </button>
+                <LikeButton songId={song.id} />
                 <button className="hover:text-gray-400">
                   <FaEllipsisH />
                 </button>

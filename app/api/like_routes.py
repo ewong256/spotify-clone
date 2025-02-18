@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from app.models import db
 from app.models import Like, Song
 
-like_routes = Blueprint("likes", __name__, url_prefix="/api/songs")
+like_routes = Blueprint("likes", __name__)
 
 # GET User can see the number of likes on a song
 @like_routes.route('/<int:song_id>/likes', methods=['GET'])
