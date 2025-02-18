@@ -1,59 +1,20 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSongs, addSong, editSong, deleteSong } from "../../redux/songs";
-import { FaHeart, FaPlay, FaEllipsisH, FaTrash, FaEdit } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";  // For redirect
-import "./SongPage.css";
+import { fetchSongs } from "../../redux/songs";
+import { FaHeart, FaPlay, FaEllipsisH, FaEdit } from "react-icons/fa";
+import CreateSong from "../CreateSong/createSong";
+import UpdateSong from "../UpdateSong/updateSong";
+import "../SongPage.css";
 
 const SongsPage = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();  // Initialize navigation for redirect
   const { songs, status, error } = useSelector((state) => state.songs);
-  const currentUser = useSelector((state) => state.session.user); // Check for authenticated user
-
-  const [newSong, setNewSong] = useState({ title: "", song_url: "", album_id: 1 });
-  const [editData, setEditData] = useState(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingSong, setEditingSong] = useState(null); 
 
   useEffect(() => {
     dispatch(fetchSongs());
   }, [dispatch]);
-
-  useEffect(() => {
-    if (!currentUser) {
-      // Redirect to login page if the user is not authenticated
-      navigate('/login');
-    }
-  }, [currentUser, navigate]);
-
-  const handleAddSong = (e) => {
-    e.preventDefault();
-    if (!currentUser) {
-      alert("You must be logged in to add a song.");
-      return;
-    }
-    dispatch(addSong(newSong));
-    setNewSong({ title: "", song_url: "", album_id: 1 });
-  };
-
-  const handleEditSong = (e) => {
-    e.preventDefault();
-    if (!currentUser) {
-      alert("You must be logged in to edit a song.");
-      return;
-    }
-    if (editData) {
-      dispatch(editSong(editData.id, editData));
-      setEditData(null);
-    }
-  };
-
-  const handleDeleteSong = (songId) => {
-    if (!currentUser) {
-      alert("You must be logged in to delete a song.");
-      return;
-    }
-    dispatch(deleteSong(songId));
-  };
 
   if (status === "loading") return <p>Loading songs...</p>;
   if (status === "failed") return <p>Error: {error}</p>;
@@ -62,48 +23,15 @@ const SongsPage = () => {
     <div className="p-8 bg-gray-900 min-h-screen text-white">
       <h2 className="text-3xl font-bold mb-6">All Songs</h2>
 
-      {/* Show form only if user is logged in */}
-      {currentUser && (
-        <>
-          {/* Add New Song Form */}
-          <form onSubmit={handleAddSong} className="mb-6">
-            <input
-              type="text"
-              value={newSong.title}
-              onChange={(e) => setNewSong({ ...newSong, title: e.target.value })}
-              placeholder="Song Title"
-              className="p-2 border rounded"
-            />
-            <input
-              type="text"
-              value={newSong.song_url}
-              onChange={(e) => setNewSong({ ...newSong, song_url: e.target.value })}
-              placeholder="Song URL"
-              className="p-2 border rounded"
-            />
-            <button type="submit" className="ml-2 bg-green-500 text-white px-4 py-2 rounded">
-              Add Song
-            </button>
-          </form>
+      <button
+        className="mb-4 p-2 bg-green-500 text-white rounded"
+        onClick={() => setShowCreateForm(true)}
+      >
+        Add New Song
+      </button>
 
-          {/* Edit Song Form */}
-          {editData && (
-            <form onSubmit={handleEditSong} className="mb-6">
-              <input
-                type="text"
-                value={editData.title}
-                onChange={(e) => setEditData({ ...editData, title: e.target.value })}
-                className="p-2 border rounded"
-              />
-              <button type="submit" className="ml-2 bg-blue-500 text-white px-4 py-2 rounded">
-                Save Changes
-              </button>
-            </form>
-          )}
-        </>
-      )}
+      {showCreateForm && <CreateSong />}
 
-      {/* Songs Table */}
       <table className="w-full text-left">
         <thead>
           <tr className="border-b border-gray-700">
@@ -124,27 +52,28 @@ const SongsPage = () => {
                 <button className="mr-2 hover:text-red-400">
                   <FaHeart />
                 </button>
-                {currentUser && (
-                  <>
-                    <button
-                      className="mr-2 hover:text-blue-400"
-                      onClick={() => setEditData(song)}
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      className="hover:text-gray-400"
-                      onClick={() => handleDeleteSong(song.id)}
-                    >
-                      <FaTrash />
-                    </button>
-                  </>
-                )}
+                <button
+                  className="mr-2 hover:text-blue-400"
+                  onClick={() => setEditingSong(song)}
+                >
+                  <FaEdit />
+                </button>
+                <button className="hover:text-gray-400">
+                  <FaEllipsisH />
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {editingSong && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <UpdateSong song={editingSong} closeModal={() => setEditingSong(null)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

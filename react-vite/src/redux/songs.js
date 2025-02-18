@@ -2,108 +2,75 @@ const FETCH_SONGS_START = "songs/FETCH_SONGS_START";
 const FETCH_SONGS_SUCCESS = "songs/FETCH_SONGS_SUCCESS";
 const FETCH_SONGS_FAILURE = "songs/FETCH_SONGS_FAILURE";
 
-const ADD_SONG_SUCCESS = "songs/ADD_SONG_SUCCESS";
-const EDIT_SONG_SUCCESS = "songs/EDIT_SONG_SUCCESS";
-const DELETE_SONG_SUCCESS = "songs/DELETE_SONG_SUCCESS";
+const CREATE_SONG_START = "songs/CREATE_SONG_START";
+const CREATE_SONG_SUCCESS = "songs/CREATE_SONG_SUCCESS";
+const CREATE_SONG_FAILURE = "songs/CREATE_SONG_FAILURE";
 
-// Action creators
+const UPDATE_SONG_START = "songs/UPDATE_SONG_START";
+const UPDATE_SONG_SUCCESS = "songs/UPDATE_SONG_SUCCESS";
+const UPDATE_SONG_FAILURE = "songs/UPDATE_SONG_FAILURE";
+
+// Action Creators
 const fetchSongsStart = () => ({ type: FETCH_SONGS_START });
 const fetchSongsSuccess = (songs) => ({ type: FETCH_SONGS_SUCCESS, payload: songs });
 const fetchSongsFailure = (error) => ({ type: FETCH_SONGS_FAILURE, payload: error });
 
-const addSongSuccess = (song) => ({ type: ADD_SONG_SUCCESS, payload: song });
-const editSongSuccess = (song) => ({ type: EDIT_SONG_SUCCESS, payload: song });
-const deleteSongSuccess = (songId) => ({ type: DELETE_SONG_SUCCESS, payload: songId });
+const createSongStart = () => ({ type: CREATE_SONG_START });
+const createSongSuccess = (song) => ({ type: CREATE_SONG_SUCCESS, payload: song });
+const createSongFailure = (error) => ({ type: CREATE_SONG_FAILURE, payload: error });
 
-// Dynamically set API base URL based on current environment
-const API_BASE_URL = "http://localhost:5173/api";
+const updateSongStart = () => ({ type: UPDATE_SONG_START });
+const updateSongSuccess = (song) => ({ type: UPDATE_SONG_SUCCESS, payload: song });
+const updateSongFailure = (error) => ({ type: UPDATE_SONG_FAILURE, payload: error });
 
-
-// **Fetch Songs**
+// Thunks
 export const fetchSongs = () => async (dispatch) => {
-    dispatch(fetchSongsStart());
-    try {
-      const response = await fetch(`${API_BASE_URL}/songs`, {
-        method: "GET",
-        credentials: "include", // Required if using cookies for auth
-      });
-  
-      if (!response.ok) {
-        throw new Error("Failed to fetch songs");
-      }
-  
-      const data = await response.json();
-      dispatch(fetchSongsSuccess(data.songs));
-    } catch (error) {
-      dispatch(fetchSongsFailure(error.message));
-    }
-  };
-
-// **Thunk to Add a Song**
-export const addSong = (songData) => async (dispatch) => {
+  dispatch(fetchSongsStart());
   try {
-    const response = await fetch(`${API_BASE_URL}/songs`, {
+    const response = await fetch("/api/songs");
+    const data = await response.json();
+    dispatch(fetchSongsSuccess(data.songs));
+  } catch (error) {
+    dispatch(fetchSongsFailure(error.message));
+  }
+};
+
+export const createSong = (formData) => async (dispatch) => {
+  dispatch(createSongStart());
+  try {
+    const response = await fetch("/api/songs", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(songData),
+      body: formData,
     });
-
-    if (!response.ok) {
-      throw new Error("Failed to add song");
-    }
-
     const data = await response.json();
-    dispatch(addSongSuccess(data.song));
+    dispatch(createSongSuccess(data.song));
   } catch (error) {
-    console.error(error);
+    dispatch(createSongFailure(error.message));
   }
 };
 
-// **Thunk to Edit a Song**
-export const editSong = (songId, updatedData) => async (dispatch) => {
+export const updateSong = (songId, formData) => async (dispatch) => {
+  dispatch(updateSongStart());
   try {
-    const response = await fetch(`${API_BASE_URL}/songs/${songId}`, {
+    const response = await fetch(`/api/songs/${songId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedData),
+      body: formData,
     });
-
-    if (!response.ok) {
-      throw new Error("Failed to edit song");
-    }
-
     const data = await response.json();
-    dispatch(editSongSuccess(data));
+    dispatch(updateSongSuccess(data.song));
   } catch (error) {
-    console.error(error);
+    dispatch(updateSongFailure(error.message));
   }
 };
 
-// **Thunk to Delete a Song**
-export const deleteSong = (songId) => async (dispatch) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/songs/${songId}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to delete song");
-    }
-
-    dispatch(deleteSongSuccess(songId));
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-// **Initial State**
+// Initial State
 const initialState = {
   songs: [],
   status: "idle", // "idle" | "loading" | "succeeded" | "failed"
   error: null,
 };
 
-// **Reducer**
+// Reducer
 export default function songsReducer(state = initialState, action) {
   switch (action.type) {
     case FETCH_SONGS_START:
@@ -113,22 +80,29 @@ export default function songsReducer(state = initialState, action) {
     case FETCH_SONGS_FAILURE:
       return { ...state, status: "failed", error: action.payload };
 
-    case ADD_SONG_SUCCESS:
-      return { ...state, songs: [...state.songs, action.payload] };
-
-    case EDIT_SONG_SUCCESS:
+    case CREATE_SONG_START:
+      return { ...state, status: "loading" };
+    case CREATE_SONG_SUCCESS:
       return {
         ...state,
+        status: "succeeded",
+        songs: [...state.songs, action.payload],
+      };
+    case CREATE_SONG_FAILURE:
+      return { ...state, status: "failed", error: action.payload };
+
+    case UPDATE_SONG_START:
+      return { ...state, status: "loading" };
+    case UPDATE_SONG_SUCCESS:
+      return {
+        ...state,
+        status: "succeeded",
         songs: state.songs.map((song) =>
           song.id === action.payload.id ? action.payload : song
         ),
       };
-
-    case DELETE_SONG_SUCCESS:
-      return {
-        ...state,
-        songs: state.songs.filter((song) => song.id !== action.payload),
-      };
+    case UPDATE_SONG_FAILURE:
+      return { ...state, status: "failed", error: action.payload };
 
     default:
       return state;
