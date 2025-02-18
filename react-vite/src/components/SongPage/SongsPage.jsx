@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSongs } from "../../redux/songs";
 import { FaHeart, FaPlay, FaEllipsisH, FaEdit } from "react-icons/fa";
-import CreateSong from "../CreateSong/createSong.jsx";
-import UpdateSong from "../UpdateSong/updateSong.jsx";
+import CreateSong from "../CreateSong/CreateSong.jsx";
+import UpdateSong from "../UpdateSong/UpdateSong.jsx";
 import "../SongPage/SongPage.css";
 
 const SongsPage = () => {
