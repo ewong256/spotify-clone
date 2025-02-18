@@ -2,15 +2,15 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSongs } from "../../redux/songs";
 import { FaHeart, FaPlay, FaEllipsisH, FaEdit } from "react-icons/fa";
-import CreateSong from "../CreateSong/createSong";
-import UpdateSong from "../UpdateSong/updateSong";
-import "../SongPage.css";
+import CreateSong from "../CreateSong/CreateSong.jsx";
+import UpdateSong from "../UpdateSong/UpdateSong.jsx";
+import "../SongPage/SongPage.css";
 
 const SongsPage = () => {
   const dispatch = useDispatch();
   const { songs, status, error } = useSelector((state) => state.songs);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingSong, setEditingSong] = useState(null); 
+  const [editingSong, setEditingSong] = useState(null);
 
   useEffect(() => {
     dispatch(fetchSongs());

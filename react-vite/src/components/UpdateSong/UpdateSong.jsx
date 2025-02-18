@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { updateSong } from "../../redux/songs"; 
-import "../UpdateSong.css";
+import { updateSong } from "../../redux/songs";
+import "../UpdateSong/UpdateSong.css";
 
 const UpdateSong = ({ song, closeModal }) => {
   const dispatch = useDispatch();
-  
-  
+
+
   const [title, setTitle] = useState(song.title);
   const [image, setImage] = useState(null);
   const [songFile, setSongFile] = useState(null);
@@ -17,7 +17,7 @@ const UpdateSong = ({ song, closeModal }) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", title);
-    
+
     if (image) {
       formData.append("image", image);
     }
