@@ -49,16 +49,16 @@ export const thunkFetchAllPlaylists = () => async (dispatch) => {
 };
 
 export const thunkRenamePlaylist = (playlistId, title) => async (dispatch) => {
-  const token = localStorage.getItem("token"); // Or use Redux state if you store the user session token there
+  const token = localStorage.getItem("token");
   const response = await fetch(`/api/playlists/${playlistId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`, // Add the token here
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ title }),
   });
-  
+
   if (response.ok) {
     dispatch(updatePlaylist(playlistId, title));
     return true;
@@ -74,11 +74,14 @@ export const thunkAddSong = (playlistId, songId) => async (dispatch) => {
   });
 
   if (response.ok) {
-    const newSong = await response.json();
-    dispatch(addSongToPlaylist(playlistId, newSong));
+    const data = await response.json();
+    dispatch(addSongToPlaylist(playlistId, data.song));
     return true;
+  } else {
+    const errorData = await response.json();
+    alert(errorData.error || "Failed to add song.");
+    return false;
   }
-  return false;
 };
 
 export const thunkRemoveSong = (playlistId, songId) => async (dispatch) => {
@@ -96,7 +99,14 @@ export const thunkRemoveSong = (playlistId, songId) => async (dispatch) => {
 const playlistReducer = (state = {}, action) => {
   switch (action.type) {
     case LOAD_PLAYLIST:
-      return { ...state, [action.playlist.id]: action.playlist };
+      return {
+        ...state,
+        [action.playlist.id]: {
+          ...action.playlist,
+          songs: action.playlist.songs || [],
+        },
+      };
+
     case UPDATE_PLAYLIST:
       return {
         ...state,
@@ -105,29 +115,35 @@ const playlistReducer = (state = {}, action) => {
           title: action.title,
         },
       };
+
     case LOAD_PLAYLISTS: {
       const newPlaylists = { ...state };
       action.playlists.forEach((pl) => {
-        newPlaylists[pl.id] = pl;
+        newPlaylists[pl.id] = { ...pl, songs: pl.songs || [] };
       });
       return newPlaylists;
     }
+
     case ADD_SONG:
       return {
         ...state,
         [action.playlistId]: {
           ...state[action.playlistId],
-          songs: [...state[action.playlistId].songs, action.song],
+          songs: [...(state[action.playlistId].songs || []), action.song],
         },
       };
+
     case REMOVE_SONG:
       return {
         ...state,
         [action.playlistId]: {
           ...state[action.playlistId],
-          songs: state[action.playlistId].songs.filter((s) => s.id !== action.songId),
+          songs: (state[action.playlistId].songs || []).filter(
+            (s) => s.id !== action.songId
+          ),
         },
       };
+
     default:
       return state;
   }
