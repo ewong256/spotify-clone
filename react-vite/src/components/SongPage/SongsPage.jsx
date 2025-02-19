@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSongs } from "../../redux/songs";
-import { FaHeart, FaPlay, FaEllipsisH, FaEdit } from "react-icons/fa";
+import { fetchSongs, deleteSong } from "../../redux/songs"; 
+import { FaHeart, FaPlay, FaEllipsisH, FaEdit, FaTrash } from "react-icons/fa"; 
 import CreateSong from "../CreateSong/CreateSong.jsx";
 import UpdateSong from "../UpdateSong/UpdateSong.jsx";
 import "../SongPage/SongPage.css";
 
-const SongsPage = () => {
+const SongPage = () => {
   const dispatch = useDispatch();
   const { songs, status, error } = useSelector((state) => state.songs);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -18,6 +18,13 @@ const SongsPage = () => {
 
   if (status === "loading") return <p>Loading songs...</p>;
   if (status === "failed") return <p>Error: {error}</p>;
+
+  const handleDelete = (songId) => {
+    // Confirm before deleting
+    if (window.confirm("Are you sure you want to delete this song?")) {
+      dispatch(deleteSong(songId));
+    }
+  };
 
   return (
     <div className="p-8 bg-gray-900 min-h-screen text-white">
@@ -66,6 +73,13 @@ const SongsPage = () => {
                 >
                   <FaEdit />
                 </button>
+                {/* Delete Button */}
+                <button
+                  className="mr-2 hover:text-red-600"
+                  onClick={() => handleDelete(song.id)} // Delete song when clicked
+                >
+                  <FaTrash />
+                </button>
                 <button className="hover:text-gray-400">
                   <FaEllipsisH />
                 </button>
@@ -79,7 +93,7 @@ const SongsPage = () => {
       {editingSong && (
         <div className="modal-overlay">
           <div className="modal">
-            <UpdateSong song={editingSong} onClose={() => setEditingSong(null)} />
+            <UpdateSong song={editingSong} closeModal={() => setEditingSong(null)} />
           </div>
         </div>
       )}
@@ -87,4 +101,4 @@ const SongsPage = () => {
   );
 };
 
-export default SongsPage;
+export default SongPage;

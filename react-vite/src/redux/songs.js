@@ -10,6 +10,10 @@ const UPDATE_SONG_START = "songs/UPDATE_SONG_START";
 const UPDATE_SONG_SUCCESS = "songs/UPDATE_SONG_SUCCESS";
 const UPDATE_SONG_FAILURE = "songs/UPDATE_SONG_FAILURE";
 
+const DELETE_SONG_START = "songs/DELETE_SONG_START";
+const DELETE_SONG_SUCCESS = "songs/DELETE_SONG_SUCCESS";
+const DELETE_SONG_FAILURE = "songs/DELETE_SONG_FAILURE";
+
 // Action Creators
 const fetchSongsStart = () => ({ type: FETCH_SONGS_START });
 const fetchSongsSuccess = (songs) => ({ type: FETCH_SONGS_SUCCESS, payload: songs });
@@ -22,6 +26,10 @@ const createSongFailure = (error) => ({ type: CREATE_SONG_FAILURE, payload: erro
 const updateSongStart = () => ({ type: UPDATE_SONG_START });
 const updateSongSuccess = (song) => ({ type: UPDATE_SONG_SUCCESS, payload: song });
 const updateSongFailure = (error) => ({ type: UPDATE_SONG_FAILURE, payload: error });
+
+const deleteSongStart = () => ({ type: DELETE_SONG_START });
+const deleteSongSuccess = (songId) => ({ type: DELETE_SONG_SUCCESS, payload: songId });
+const deleteSongFailure = (error) => ({ type: DELETE_SONG_FAILURE, payload: error });
 
 // Thunks
 export const fetchSongs = () => async (dispatch) => {
@@ -60,6 +68,23 @@ export const updateSong = (songId, formData) => async (dispatch) => {
     dispatch(updateSongSuccess(data.song));
   } catch (error) {
     dispatch(updateSongFailure(error.message));
+  }
+};
+
+export const deleteSong = (songId) => async (dispatch) => {
+  dispatch(deleteSongStart());
+  try {
+    const response = await fetch(`/api/songs/${songId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete the song");
+    }
+
+    dispatch(deleteSongSuccess(songId)); // remove song from the Redux store
+  } catch (error) {
+    dispatch(deleteSongFailure(error.message));
   }
 };
 
@@ -102,6 +127,17 @@ export default function songsReducer(state = initialState, action) {
         ),
       };
     case UPDATE_SONG_FAILURE:
+      return { ...state, status: "failed", error: action.payload };
+
+    case DELETE_SONG_START:
+      return { ...state, status: "loading" };
+    case DELETE_SONG_SUCCESS:
+      return {
+        ...state,
+        status: "succeeded",
+        songs: state.songs.filter((song) => song.id !== action.payload),
+      };
+    case DELETE_SONG_FAILURE:
       return { ...state, status: "failed", error: action.payload };
 
     default:
