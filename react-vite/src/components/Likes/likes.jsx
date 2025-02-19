@@ -1,28 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLikes, likeSongs, unlikeSongs } from "../../redux/likes";
 
-const LikeButton = ({ songId, userId }) => {
+const LikeButton = ({ song }) => {
     const dispatch = useDispatch();
-    const likes = useSelector((state) => state.likes[songId] || 0);
-    const [liked, setLiked] = useState(false);
+    const currUserId = useSelector((state) => state.session.user?.id);
 
     useEffect(() => {
-        dispatch(fetchLikes(songId));
-    }, [dispatch, songId, userId]);
-
-    const handleLike = async () => {
-        if (liked) {
-            await dispatch(unlikeSongs(songId, userId));
-        } else {
-            await dispatch(likeSongs(songId, userId));
+        if (song?.id) {
+            dispatch(fetchLikes(song.id));
         }
-        setLiked(!liked);
-    };
+    }, [dispatch, song?.id]);
+
+    const likesForSong = useSelector((state) => state.likes[song.id] || []);
+    const currUserLikes = likesForSong.find((data) => data.user_id === currUserId);
+    const likeCount = likesForSong.length;
+
+    function handleLike() {
+        if (currUserLikes) {
+            dispatch(unlikeSongs(song.id, currUserId));
+        } else {
+            dispatch(likeSongs(song.id, currUserId));
+        }
+    }
 
     return (
-        <button onClick={handleLike} className={`like-button ${liked ? "liked" : ""}`}>
-            {liked ? "Unlike" : "Like"} {likes} Likes
+        <button onClick={handleLike}>
+            {currUserLikes ? "Unlike" : "Like"} {likeCount} Likes
         </button>
     );
 };

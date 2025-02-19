@@ -4,7 +4,8 @@ from app.models import db, Song
 from app.aws import upload_file_to_s3, delete_file_from_s3
 from werkzeug.utils import secure_filename
 import uuid
-
+from app.models import Like
+from sqlalchemy.orm import joinedload
 song_routes = Blueprint("songs", __name__)
 
 # Allowed file extensions
@@ -33,8 +34,8 @@ def get_all_songs():
     """
     Get all songs and return them as a list of dictionaries.
     """
-    songs = Song.query.all()
-    return {"songs": [song.to_dict() for song in songs]}, 200
+    songs = Song.query.options(joinedload(Like.id == Song.id)).all()
+    return {"songs": [song.to_dict_with_likes() for song in songs]}, 200
 
 
 # Get a single song by ID

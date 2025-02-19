@@ -29,24 +29,31 @@ const SongsPage = () => {
         </thead>
         <tbody>
           {songs.map((song, index) => (
-            <tr key={song.id} className="border-b border-gray-800 hover:bg-gray-800">
-              <td className="py-2">{index + 1}</td>
-              <td>{song.title}</td>
-              <td>
-                <button className="mr-2 hover:text-green-400">
-                  <FaPlay />
-                </button>
-                <LikeButton songId={song.id} />
-                <button className="hover:text-gray-400">
-                  <FaEllipsisH />
-                </button>
-              </td>
-            </tr>
+
+    <SongDetail key={song.id} song={song} index={index} />
           ))}
         </tbody>
       </table>
     </div>
   );
 };
+
+function SongDetail({ song, index }) {
+  return (
+    <tr className="border-b border-gray-800 hover:bg-gray-800">
+    <td className="py-2">{index + 1}</td>
+    <td>{song.title}</td>
+    <td>
+      <button className="mr-2 hover:text-green-400">
+        <FaPlay />
+      </button>
+      <LikeButton key={song.id} song={song} />
+      <button className="hover:text-gray-400">
+        <FaEllipsisH />
+      </button>
+    </td>
+  </tr>
+  )
+}
 
 export default SongsPage;

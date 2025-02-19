@@ -4,20 +4,24 @@ const LIKE_SONG = "likes/likeSong"
 const UNLIKE_SONG = "likes/unlikeSong"
 
 // Actions Creators
-const loadLikes = (songId, likes) => ({
+const loadLikes = (songId, likes, users) => ({
     type: LOAD_LIKES,
     songId,
-    likes
+    likes,
+    users
 });
 
-const likeSong = (songId) => ({
-    type: LIKE_SONG,
-    songId
-});
+const likeSong = (payload) => {
+    return {
+        type: LIKE_SONG,
+        payload: { song_id: payload.song_id, user_id: payload.user, id: payload.new_like_id }
+    }
+}
 
-const unlikeSong = (songId) => ({
+const unlikeSong = (songId, userId) => ({
     type: UNLIKE_SONG,
-    songId
+    songId,
+    userId
 });
 
 // Thunks
@@ -25,7 +29,7 @@ export const fetchLikes = (songId) => async (dispatch) => {
     const res = await fetch(`/api/songs/${songId}/likes`);
     if (res.ok) {
         const data = await res.json();
-        dispatch(loadLikes(songId, data.likes))
+        dispatch(loadLikes(songId, data.users.length, data.users))
     }
 };
 
@@ -36,7 +40,8 @@ export const likeSongs = (songId, userId) => async (dispatch) => {
         body: JSON.stringify({ user_id: userId }),
     });
     if (res.ok) {
-        dispatch(likeSong(songId, userId))
+        let resBody = await res.json()
+        dispatch(likeSong(resBody))
     }
 };
 
@@ -52,16 +57,20 @@ export const unlikeSongs = (songId, userId) => async (dispatch) => {
 };
 
 
-// Reducer
 export default function likesReducer(state = {}, action) {
     switch(action.type) {
-        case LOAD_LIKES:
-            return { ...state, [action.songId]: action.likes};
-            case LIKE_SONG:
-                return { ...state, [action.songId]: (state[action.songId] || 0) + 1 };
-              case UNLIKE_SONG:
-                return { ...state, [action.songId]: Math.max((state[action.songId] || 1) - 1, 0) };
-              default:
+        case "songs/FETCH_SONGS_SUCCESS":
+            let likeArr = action.payload.reduce((acc, song) => {
+                acc[song.id] = song.likes;
+                return acc;
+            }, {});
+            return { ...state, ...likeArr };
+        case LIKE_SONG:
+                const updatedLikes = [...(state[action.payload.song_id] || []), action.payload];
+                return { ...state, [action.payload.song_id]: updatedLikes };
+        case UNLIKE_SONG:
+                return { ...state, [action.songId]: state[action.songId].filter(like => like.user_id !== action.userId)};
+        default:
                 return state;
     }
 }
