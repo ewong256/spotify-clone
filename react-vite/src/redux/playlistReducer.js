@@ -1,9 +1,13 @@
+// Constants
 const LOAD_PLAYLIST = "playlists/loadPlaylist";
-const REMOVE_SONG = "playlists/removeSong";
-const ADD_SONG = "playlists/addSong";
-const UPDATE_PLAYLIST = "playlists/updatePlaylist";
 const LOAD_PLAYLISTS = "playlists/loadPlaylists";
+const CREATE_PLAYLIST = "playlists/createPlaylist";
+const UPDATE_PLAYLIST = "playlists/updatePlaylist";
+const DELETE_PLAYLIST = "playlists/deletePlaylist";
+const ADD_SONG = "playlists/addSong";
+const REMOVE_SONG = "playlists/removeSong";
 
+// Action Creators
 const loadPlaylist = (playlist) => ({
   type: LOAD_PLAYLIST,
   playlist,
@@ -14,14 +18,8 @@ const loadPlaylists = (playlists) => ({
   playlists,
 });
 
-const removeSongFromPlaylist = (playlistId, songId) => ({
-  type: REMOVE_SONG,
-  playlistId,
-  songId,
-});
-
-const addSongToPlaylist = (playlist) => ({
-  type: ADD_SONG,
+const createPlaylistAction = (playlist) => ({
+  type: CREATE_PLAYLIST,
   playlist,
 });
 
@@ -31,22 +29,73 @@ const updatePlaylist = (playlistId, title) => ({
   title,
 });
 
+const deletePlaylist = (playlistId) => ({
+  type: DELETE_PLAYLIST,
+  playlistId,
+});
+
+const addSongToPlaylist = (playlist) => ({
+  type: ADD_SONG,
+  playlist,
+});
+
+const removeSongFromPlaylist = (playlistId, songId) => ({
+  type: REMOVE_SONG,
+  playlistId,
+  songId,
+});
+
+// Thunks
+
 // Fetch a single playlist
 export const thunkFetchPlaylist = (playlistId) => async (dispatch) => {
   const response = await fetch(`/api/playlists/${playlistId}`);
+
   if (response.ok) {
     const playlist = await response.json();
-    dispatch(loadPlaylist(playlist));
+    if (playlist?.id) dispatch(loadPlaylist(playlist));
   }
 };
 
 // Fetch all playlists
 export const thunkFetchAllPlaylists = () => async (dispatch) => {
-  const res = await fetch("/api/playlists");
-  if (res.ok) {
-    const playlists = await res.json();
-    dispatch(loadPlaylists(playlists));
+  const response = await fetch("/api/playlists");
+
+  if (response.ok) {
+    const playlistsArray = await response.json();
+
+    if (Array.isArray(playlistsArray)) {
+      const playlists = {};
+      playlistsArray.forEach((playlist) => {
+        playlists[playlist.id] = { ...playlist, songs: playlist.songs || [] };
+      });
+      dispatch(loadPlaylists(playlists));
+    }
   }
+};
+
+// Create a playlist
+export const thunkCreatePlaylist = (title, imageUrl) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch("/api/playlists", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ title, image_url: imageUrl }),
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    dispatch(createPlaylistAction(data.playlist));
+
+    // Fetch all playlists again to ensure UI updates
+    dispatch(thunkFetchAllPlaylists());
+
+    return data.playlist;
+  }
+  return null;
 };
 
 // Rename a playlist
@@ -68,7 +117,24 @@ export const thunkRenamePlaylist = (playlistId, title) => async (dispatch) => {
   return false;
 };
 
-// Add a song to a playlist and update the Redux store
+// Delete a playlist
+export const thunkDeletePlaylist = (playlistId) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`/api/playlists/${playlistId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (response.ok) {
+    dispatch(deletePlaylist(playlistId));
+    return true;
+  }
+  return false;
+};
+
+// Add a song to a playlist
 export const thunkAddSong = (playlistId, songId) => async (dispatch) => {
   const response = await fetch(`/api/playlists/${playlistId}/songs`, {
     method: "POST",
@@ -78,13 +144,10 @@ export const thunkAddSong = (playlistId, songId) => async (dispatch) => {
 
   if (response.ok) {
     const data = await response.json();
-    dispatch(addSongToPlaylist(data.playlist)); // Update the entire playlist in Redux
+    dispatch(addSongToPlaylist(data.playlist));
     return true;
-  } else {
-    const errorData = await response.json();
-    alert(errorData.error || "Failed to add song.");
-    return false;
   }
+  return false;
 };
 
 // Remove a song from a playlist
@@ -100,6 +163,7 @@ export const thunkRemoveSong = (playlistId, songId) => async (dispatch) => {
   return false;
 };
 
+// Reducer
 const playlistReducer = (state = {}, action) => {
   switch (action.type) {
     case LOAD_PLAYLIST:
@@ -111,7 +175,21 @@ const playlistReducer = (state = {}, action) => {
         },
       };
 
+    case LOAD_PLAYLISTS:
+      return { ...action.playlists };
+
+    case CREATE_PLAYLIST:
+      if (!action.playlist?.id) return state;
+      return {
+        ...state,
+        [action.playlist.id]: {
+          ...action.playlist,
+          songs: action.playlist.songs || [],
+        },
+      };
+
     case UPDATE_PLAYLIST:
+      if (!state[action.playlistId]) return state;
       return {
         ...state,
         [action.playlistId]: {
@@ -120,15 +198,14 @@ const playlistReducer = (state = {}, action) => {
         },
       };
 
-    case LOAD_PLAYLISTS: {
-      const newPlaylists = { ...state };
-      action.playlists.forEach((pl) => {
-        newPlaylists[pl.id] = { ...pl, songs: pl.songs || [] };
-      });
-      return newPlaylists;
+    case DELETE_PLAYLIST: {
+      const newState = { ...state };
+      delete newState[action.playlistId];
+      return newState;
     }
 
     case ADD_SONG:
+      if (!action.playlist?.id) return state;
       return {
         ...state,
         [action.playlist.id]: {
@@ -138,13 +215,12 @@ const playlistReducer = (state = {}, action) => {
       };
 
     case REMOVE_SONG:
+      if (!state[action.playlistId]) return state;
       return {
         ...state,
         [action.playlistId]: {
           ...state[action.playlistId],
-          songs: state[action.playlistId].songs.filter(
-            (song) => song.id !== action.songId
-          ),
+          songs: state[action.playlistId].songs.filter((song) => song.id !== action.songId),
         },
       };
 

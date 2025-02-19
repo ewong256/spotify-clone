@@ -12,18 +12,24 @@ def create_playlist():
 
     new_playlist = Playlist(
         title=data['title'],
-        user_id=current_user.id,  # Using current_user from Flask-Login
+        user_id=current_user.id,
         image_url=data.get('image_url', '')
     )
     db.session.add(new_playlist)
     db.session.commit()
 
-    return jsonify({"message": "Playlist created successfully", "playlist": new_playlist.id}), 201
+    return jsonify({
+        "id": new_playlist.id,
+        "title": new_playlist.title,
+        "image_url": new_playlist.image_url,
+        "user_id": new_playlist.user_id,
+        "songs": []  # New playlist starts with no songs
+    }), 201
 
-# GET All Playlists for a User
+# GET All Playlists (Publicly accessible)
 @playlist_routes.route('', methods=['GET'])
 @login_required
-def get_user_playlists():
+def get_all_playlists():
     playlists = Playlist.query.all()
     return jsonify([{
         "id": playlist.id,
@@ -37,6 +43,10 @@ def get_user_playlists():
 @login_required
 def get_playlist(playlist_id):
     playlist = Playlist.query.get_or_404(playlist_id)
+
+    if playlist.user_id != current_user.id:
+        return jsonify({"error": "You do not have permission to view this playlist"}), 403
+
     songs = [{
         "id": ps.song.id,
         "title": ps.song.title,
@@ -73,7 +83,12 @@ def update_playlist(playlist_id):
     playlist.image_url = data.get('image_url', playlist.image_url)
     db.session.commit()
 
-    return jsonify({"message": "Playlist updated"})
+    return jsonify({
+        "id": playlist.id,
+        "title": playlist.title,
+        "image_url": playlist.image_url,
+        "user_id": playlist.user_id
+    })
 
 # DELETE Playlist
 @playlist_routes.route('/<int:playlist_id>', methods=['DELETE'])
@@ -121,14 +136,12 @@ def add_song_to_playlist(playlist_id):
     } for ps in playlist.songs]
 
     return jsonify({
-        "message": "Song added to playlist",
-        "playlist": {
-            "id": playlist.id,
-            "title": playlist.title,
-            "songs": songs
-        }
+        "id": playlist.id,
+        "title": playlist.title,
+        "image_url": playlist.image_url,
+        "user_id": playlist.user_id,
+        "songs": songs
     }), 201
-
 
 # REMOVE Song from Playlist
 @playlist_routes.route('/<int:playlist_id>/songs/<int:song_id>', methods=['DELETE'])
@@ -138,6 +151,22 @@ def remove_song_from_playlist(playlist_id, song_id):
     if entry:
         db.session.delete(entry)
         db.session.commit()
-        return jsonify({"message": "Song removed from playlist"})
+
+        # Fetch updated playlist after song removal
+        playlist = Playlist.query.get(playlist_id)
+        songs = [{
+            "id": ps.song.id,
+            "title": ps.song.title,
+            "artist": ps.song.artist,
+            "album": ps.song.album
+        } for ps in playlist.songs]
+
+        return jsonify({
+            "id": playlist.id,
+            "title": playlist.title,
+            "image_url": playlist.image_url,
+            "user_id": playlist.user_id,
+            "songs": songs
+        })
     else:
         return jsonify({"error": "Song not found in playlist"}), 404
