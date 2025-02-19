@@ -7,10 +7,12 @@ import {
 import thunk from "redux-thunk";
 import sessionReducer from "./session";
 import playlistsReducer from "./playlistReducer";
+import songsReducer from "./songs";
 
 
 const rootReducer = combineReducers({
   session: sessionReducer,
+  songs: songsReducer,
   playlists: playlistsReducer, //ADDED playlists to Redux Store
 });
 

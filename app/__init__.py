@@ -37,6 +37,9 @@ Migrate(app, db)
 
 # Security
 CORS(app)
+# Application Security
+CORS(app, supports_credentials=True)
+
 
 # Register API routes
 app.register_blueprint(user_routes, url_prefix='/api/users')
