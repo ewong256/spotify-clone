@@ -1,6 +1,11 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 from ..models import db, Playlist, PlaylistSong, Song
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 playlist_routes = Blueprint('playlist_routes', __name__)
 
@@ -50,15 +55,15 @@ def get_playlist(playlist_id):
     songs = [{
         "id": ps.song.id,
         "title": ps.song.title,
-        "artist": ps.song.artist,
-        "album": ps.song.album
+        "artist": ps.song.user.username,  # Use username from User relationship
+        "album": ps.song.albums[0].album.album_name if ps.song.albums else None  # Assuming AlbumSong links to Album
     } for ps in playlist.songs]
 
     available_songs = Song.query.all()
     available_songs_list = [{
         "id": song.id,
         "title": song.title,
-        "artist": song.artist
+        "artist": song.user.username  # Use username from User relationship
     } for song in available_songs]
 
     return jsonify({
@@ -104,15 +109,67 @@ def delete_playlist(playlist_id):
 
     return jsonify({"message": "Playlist deleted"})
 
-# ADD Song to Playlist (Only if the Song Exists in the Songs Table)
+# GET Songs in Playlist and Available Songs
+@playlist_routes.route('/<int:playlist_id>/songs', methods=['GET'])
+@login_required
+def get_playlist_songs(playlist_id):
+    try:
+        playlist = Playlist.query.get_or_404(playlist_id)
+        logger.debug(f"Fetching songs for playlist {playlist_id}, user_id: {playlist.user_id}, current_user: {current_user.id}")
+
+        if playlist.user_id != current_user.id:
+            return jsonify({"error": "You do not have permission to view this playlist"}), 403
+
+        # Songs currently in the playlist
+        songs = []
+        try:
+            songs = [{
+                "id": ps.song.id,
+                "title": ps.song.title,
+                "artist": ps.song.user.username,  # Use username from User relationship
+                "album": ps.song.albums[0].album.album_name if ps.song.albums else None  # Assuming AlbumSong links to Album
+            } for ps in playlist.songs]
+        except AttributeError as e:
+            logger.error(f"Error processing playlist songs: {e}")
+            return jsonify({"error": "Invalid playlist songs data"}), 500
+
+        # All available songs (excluding those already in the playlist)
+        playlist_song_ids = {ps.song_id for ps in playlist.songs} if playlist.songs else set()
+        try:
+            available_songs = Song.query.filter(Song.id.notin_(playlist_song_ids)).all()
+            available_songs_list = [{
+                "id": song.id,
+                "title": song.title,
+                "artist": song.user.username  # Use username from User relationship
+            } for song in available_songs]
+        except Exception as e:
+            logger.error(f"Error fetching available songs: {e}")
+            return jsonify({"error": "Failed to fetch available songs"}), 500
+
+        return jsonify({
+            "playlist_id": playlist.id,
+            "title": playlist.title,
+            "songs": songs,
+            "available_songs": available_songs_list
+        })
+    except Exception as e:
+        logger.error(f"Unhandled error in get_playlist_songs: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+# ADD Song to Playlist
 @playlist_routes.route('/<int:playlist_id>/songs', methods=['POST'])
 @login_required
 def add_song_to_playlist(playlist_id):
+    playlist = Playlist.query.get_or_404(playlist_id)
+
+    if playlist.user_id != current_user.id:
+        return jsonify({"error": "You do not have permission to modify this playlist"}), 403
+
     data = request.json
     song_id = data.get('song_id')
 
     if not song_id:
-        return jsonify({"error": "Missing song ID"}), 400
+        return jsonify({"error": "Missing song_id"}), 400
 
     song = Song.query.get(song_id)
     if not song:
@@ -126,13 +183,11 @@ def add_song_to_playlist(playlist_id):
     db.session.add(new_entry)
     db.session.commit()
 
-    # Fetch updated playlist with all songs
-    playlist = Playlist.query.get(playlist_id)
     songs = [{
         "id": ps.song.id,
         "title": ps.song.title,
-        "artist": ps.song.artist,
-        "album": ps.song.album
+        "artist": ps.song.user.username,  # Use username from User relationship
+        "album": ps.song.albums[0].album.album_name if ps.song.albums else None  # Assuming AlbumSong links to Album
     } for ps in playlist.songs]
 
     return jsonify({
@@ -147,26 +202,29 @@ def add_song_to_playlist(playlist_id):
 @playlist_routes.route('/<int:playlist_id>/songs/<int:song_id>', methods=['DELETE'])
 @login_required
 def remove_song_from_playlist(playlist_id, song_id):
+    playlist = Playlist.query.get_or_404(playlist_id)
+
+    if playlist.user_id != current_user.id:
+        return jsonify({"error": "You do not have permission to modify this playlist"}), 403
+
     entry = PlaylistSong.query.filter_by(playlist_id=playlist_id, song_id=song_id).first()
-    if entry:
-        db.session.delete(entry)
-        db.session.commit()
-
-        # Fetch updated playlist after song removal
-        playlist = Playlist.query.get(playlist_id)
-        songs = [{
-            "id": ps.song.id,
-            "title": ps.song.title,
-            "artist": ps.song.artist,
-            "album": ps.song.album
-        } for ps in playlist.songs]
-
-        return jsonify({
-            "id": playlist.id,
-            "title": playlist.title,
-            "image_url": playlist.image_url,
-            "user_id": playlist.user_id,
-            "songs": songs
-        })
-    else:
+    if not entry:
         return jsonify({"error": "Song not found in playlist"}), 404
+
+    db.session.delete(entry)
+    db.session.commit()
+
+    songs = [{
+        "id": ps.song.id,
+        "title": ps.song.title,
+        "artist": ps.song.user.username,  # Use username from User relationship
+        "album": ps.song.albums[0].album.album_name if ps.song.albums else None  # Assuming AlbumSong links to Album
+    } for ps in playlist.songs]
+
+    return jsonify({
+        "id": playlist.id,
+        "title": playlist.title,
+        "image_url": playlist.image_url,
+        "user_id": playlist.user_id,
+        "songs": songs
+    })

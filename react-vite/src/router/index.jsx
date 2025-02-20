@@ -35,7 +35,6 @@ export const router = createBrowserRouter([
         path: "songs",  // ✅ Added SongsPage inside Layout
         element: <SongsPage />,
       },
-
     ],
   },
 ]);

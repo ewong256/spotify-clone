@@ -49,7 +49,9 @@ const removeSongFromPlaylist = (playlistId, songId) => ({
 
 // Fetch a single playlist
 export const thunkFetchPlaylist = (playlistId) => async (dispatch) => {
-  const response = await fetch(`/api/playlists/${playlistId}`);
+  const response = await fetch(`/api/playlists/${playlistId}`, {
+    credentials: "include",
+  });
 
   if (response.ok) {
     const playlist = await response.json();
@@ -59,7 +61,9 @@ export const thunkFetchPlaylist = (playlistId) => async (dispatch) => {
 
 // Fetch all playlists
 export const thunkFetchAllPlaylists = () => async (dispatch) => {
-  const response = await fetch("/api/playlists");
+  const response = await fetch("/api/playlists", {
+    credentials: "include",
+  });
 
   if (response.ok) {
     const playlistsArray = await response.json();
@@ -81,19 +85,20 @@ export const thunkCreatePlaylist = (title, imageUrl) => async (dispatch) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      "Authorization": `Bearer ${token}`,
     },
     body: JSON.stringify({ title, image_url: imageUrl }),
+    credentials: "include",
   });
 
   if (response.ok) {
     const data = await response.json();
-    dispatch(createPlaylistAction(data.playlist));
+    dispatch(createPlaylistAction(data));
 
     // Fetch all playlists again to ensure UI updates
     dispatch(thunkFetchAllPlaylists());
 
-    return data.playlist;
+    return data;
   }
   return null;
 };
@@ -105,9 +110,10 @@ export const thunkRenamePlaylist = (playlistId, title) => async (dispatch) => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      "Authorization": `Bearer ${token}`,
     },
     body: JSON.stringify({ title }),
+    credentials: "include",
   });
 
   if (response.ok) {
@@ -123,8 +129,9 @@ export const thunkDeletePlaylist = (playlistId) => async (dispatch) => {
   const response = await fetch(`/api/playlists/${playlistId}`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${token}`,
+      "Authorization": `Bearer ${token}`,
     },
+    credentials: "include",
   });
 
   if (response.ok) {
@@ -136,24 +143,39 @@ export const thunkDeletePlaylist = (playlistId) => async (dispatch) => {
 
 // Add a song to a playlist
 export const thunkAddSong = (playlistId, songId) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  const csrfToken = document.cookie.match(/csrf_token=([^;]+)/)?.[1];
   const response = await fetch(`/api/playlists/${playlistId}/songs`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "X-CSRFToken": csrfToken || "",
+    },
+    credentials: "include",
     body: JSON.stringify({ song_id: songId }),
   });
 
-  if (response.ok) {
-    const data = await response.json();
-    dispatch(addSongToPlaylist(data.playlist));
-    return true;
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.log("Error adding song:", errorData);
+    return false;
   }
-  return false;
+
+  const data = await response.json();
+  dispatch(addSongToPlaylist(data));
+  return true;
 };
 
 // Remove a song from a playlist
 export const thunkRemoveSong = (playlistId, songId) => async (dispatch) => {
+  const token = localStorage.getItem("token");
   const response = await fetch(`/api/playlists/${playlistId}/songs/${songId}`, {
     method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+    credentials: "include",
   });
 
   if (response.ok) {

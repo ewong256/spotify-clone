@@ -17,32 +17,49 @@ const Playlist = () => {
   const currentUser = useSelector((state) => state.session.user);
   const navigate = useNavigate();
 
-  // State for managing playlist, songs, and errors
   const [newTitle, setNewTitle] = useState("");
   const [error, setError] = useState("");
   const [showAvailableSongs, setShowAvailableSongs] = useState(false);
-  const [availableSongs, setAvailableSongs] = useState([]); // State for all available songs
-  const [newPlaylistTitle, setNewPlaylistTitle] = useState(""); // State for creating a new playlist
+  const [availableSongs, setAvailableSongs] = useState([]);
+  const [newPlaylistTitle, setNewPlaylistTitle] = useState("");
 
   const playlists = useSelector((state) => state.playlists);
   const playlist = playlists[playlistId];
   const location = useLocation();
 
+  // Fetch all playlists when on /playlists
   useEffect(() => {
-    if (currentUser?.id) {
+    if (currentUser?.id && location.pathname === "/playlists") {
       dispatch(thunkFetchAllPlaylists());
     }
-  }, [dispatch, currentUser]);
+  }, [dispatch, currentUser, location.pathname]);
 
-  // Fetch all available songs when "Add Songs" is clicked
+  // Fetch available songs and trigger add/remove of a real song on /playlists/:id
   useEffect(() => {
-    if (showAvailableSongs) {
-      fetch("/api/songs")
+    if (playlistId && currentUser?.id) {
+      // Fetch available songs
+      fetch(`/api/playlists/${playlistId}/songs`, {
+        credentials: "include",
+      })
         .then((res) => res.json())
-        .then((data) => setAvailableSongs(data.songs || []))
+        .then((data) => {
+          console.log("Playlist songs data:", data);
+          const available = data.available_songs || [];
+          setAvailableSongs(available);
+
+          // Pick a real song not in the playlist to add and remove
+          if (available.length > 0) {
+            const songToAdd = available[0].id; // Use first available song
+            dispatch(thunkAddSong(playlistId, songToAdd)).then((success) => {
+              if (success) {
+                dispatch(thunkRemoveSong(playlistId, songToAdd));
+              }
+            });
+          }
+        })
         .catch(() => setError("Failed to fetch available songs."));
     }
-  }, [showAvailableSongs]);
+  }, [dispatch, playlistId, currentUser]);
 
   const renamePlaylist = async () => {
     const success = await dispatch(thunkRenamePlaylist(playlistId, newTitle));
@@ -53,6 +70,14 @@ const Playlist = () => {
   const addSong = async (songId) => {
     const success = await dispatch(thunkAddSong(playlistId, songId));
     if (!success) setError("Failed to add song.");
+    else {
+      // Refresh available songs after adding
+      fetch(`/api/playlists/${playlistId}/songs`, {
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then((data) => setAvailableSongs(data.available_songs || []));
+    }
   };
 
   const removeSong = async (songId) => {
@@ -62,24 +87,22 @@ const Playlist = () => {
 
   const createPlaylist = async () => {
     if (!newPlaylistTitle) {
-        setError("Please enter a title for the playlist.");
-        return;
+      setError("Please enter a title for the playlist.");
+      return;
     }
-
     const newPlaylist = await dispatch(thunkCreatePlaylist(newPlaylistTitle));
-
     if (!newPlaylist) {
-        setError("Failed to create playlist.");
+      setError("Failed to create playlist.");
     } else {
-        setNewPlaylistTitle(""); // Clear input
-        navigate(`/playlists/${newPlaylist.id}`);
+      setNewPlaylistTitle("");
+      navigate(`/playlists/${newPlaylist.id}`);
     }
   };
 
   const deletePlaylist = async () => {
     const success = await dispatch(thunkDeletePlaylist(playlistId));
     if (!success) setError("Failed to delete playlist.");
-    else navigate("/playlists"); // Navigate back to the playlists list after deleting
+    else navigate("/playlists");
   };
 
   const isOwner = playlist && currentUser?.id === playlist.user_id;
