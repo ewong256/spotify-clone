@@ -84,3 +84,24 @@
     color: #1db954;
   }
   
+  .create-album-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .create-album-btn {
+    background-color: #1db954;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .create-album-btn:hover {
+    background-color: #17a74a;
+  }
+  

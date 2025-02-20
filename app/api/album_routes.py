@@ -31,7 +31,7 @@ def generate_unique_filename(filename):
 
 
 # Get all albums
-@album_routes.route('/', methods=['GET'])
+@album_routes.route('', methods=['GET'])
 def get_albums():
     albums = Album.query.all()
     return jsonify([album.to_dict() for album in albums])
@@ -58,7 +58,7 @@ def get_album(album_id):
     })
 
 # Create new album
-@album_routes.route('/', methods=['POST'])
+@album_routes.route('', methods=['POST'])
 @login_required
 def create_album():
     """
