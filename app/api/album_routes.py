@@ -43,7 +43,7 @@ def get_album(album_id):
     return jsonify(album.to_dict())
 
 # Create new album
-@album_routes.route('/', methods=['POST'])
+@album_routes.route('', methods=['POST'])
 @login_required
 def create_album():
     """

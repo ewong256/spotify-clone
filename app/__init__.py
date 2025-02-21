@@ -47,7 +47,7 @@ app.register_blueprint(auth_routes, url_prefix='/api/auth')
 app.register_blueprint(playlist_routes, url_prefix='/api/playlists')
 app.register_blueprint(album_routes, url_prefix='/api/albums')
 app.register_blueprint(song_routes, url_prefix='/api/songs')
-app.register_blueprint(like_routes, url_prefix='/api/likes')  # Fixed prefix
+app.register_blueprint(like_routes, url_prefix='/api/songs')  # Fixed prefix
 
 @app.before_request
 def https_redirect():

@@ -4,7 +4,6 @@ import { fetchSongs, deleteSong } from "../../redux/songs";
 import { FaHeart, FaPlay, FaEllipsisH, FaEdit, FaTrash } from "react-icons/fa";
 import CreateSong from "../CreateSong/CreateSong.jsx";
 import UpdateSong from "../UpdateSong/UpdateSong.jsx";
-import LikeButton from "../Likes/likes";
 import "../SongPage/SongPage.css";
 
 const SongPage = () => {
@@ -19,6 +18,12 @@ const SongPage = () => {
 
   if (status === "loading") return <p>Loading songs...</p>;
   if (status === "failed") return <p>Error: {error}</p>;
+
+  const handleDelete = (songId) => {
+    if (window.confirm("Are you sure you want to delete this song?")) {
+      dispatch(deleteSong(songId));
+    }
+  };
 
   return (
     <div className="p-8 bg-gray-900 min-h-screen text-white">
@@ -45,15 +50,51 @@ const SongPage = () => {
         <thead>
           <tr className="border-b border-gray-700">
             <th className="py-2">#</th>
-            <th>Cover</th>
+            <th>Cover</th> {/* New column for image */}
             <th>Title</th>
-            <th>Audio</th>
+            <th>Audio</th> {/* New column for audio */}
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {songs.map((song, index) => (
-            <SongDetail key={song.id} song={song} index={index} setEditingSong={setEditingSong} />
+            <tr key={song.id} className="border-b border-gray-800 hover:bg-gray-800">
+              <td className="py-2">{index + 1}</td>
+              {/* Display Song Image */}
+              <td>
+                <img src={song.image_url} alt={song.title} className="w-16 h-16 rounded" />
+              </td>
+              <td>{song.title}</td>
+              {/* Audio Player */}
+              <td>
+                <audio controls src={song.song_url} className="w-full"></audio>
+              </td>
+              {/* Action Buttons */}
+              <td>
+                <button className="mr-2 hover:text-green-400">
+                  <FaPlay />
+                </button>
+                <button className="mr-2 hover:text-red-400">
+                  <FaHeart />
+                </button>
+                <button
+                  className="mr-2 hover:text-blue-400"
+                  onClick={() => setEditingSong(song)}
+                >
+                  <FaEdit />
+                </button>
+                {/* Delete Button */}
+                <button
+                  className="mr-2 hover:text-red-600"
+                  onClick={() => handleDelete(song.id)}
+                >
+                  <FaTrash />
+                </button>
+                <button className="hover:text-gray-400">
+                  <FaEllipsisH />
+                </button>
+              </td>
+            </tr>
           ))}
         </tbody>
       </table>
@@ -69,43 +110,5 @@ const SongPage = () => {
     </div>
   );
 };
-
-function SongDetail({ song, index, setEditingSong }) {
-  const dispatch = useDispatch();
-
-  const handleDelete = (songId) => {
-    if (window.confirm("Are you sure you want to delete this song?")) {
-      dispatch(deleteSong(songId));
-    }
-  };
-
-  return (
-    <tr className="border-b border-gray-800 hover:bg-gray-800">
-      <td className="py-2">{index + 1}</td>
-      <td>
-        <img src={song.image_url} alt={song.title} className="w-16 h-16 rounded" />
-      </td>
-      <td>{song.title}</td>
-      <td>
-        <audio controls src={song.song_url} className="w-full"></audio>
-      </td>
-      <td>
-        <button className="mr-2 hover:text-green-400">
-          <FaPlay />
-        </button>
-        <LikeButton song={song} />
-        <button className="mr-2 hover:text-blue-400" onClick={() => setEditingSong(song)}>
-          <FaEdit />
-        </button>
-        <button className="mr-2 hover:text-red-600" onClick={() => handleDelete(song.id)}>
-          <FaTrash />
-        </button>
-        <button className="hover:text-gray-400">
-          <FaEllipsisH />
-        </button>
-      </td>
-    </tr>
-  );
-}
 
 export default SongPage;

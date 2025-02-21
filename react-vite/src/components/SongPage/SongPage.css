@@ -29,7 +29,20 @@
   border-bottom: 1px solid #444;
 }
 
-/* Removed .song-row:hover */
+
+.song-table td img {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  object-fit: cover;
+  display: block;
+}
+
+
+.song-table td audio {
+  width: 150px;
+  display: block;
+}
 
 .song-actions {
   display: flex;
@@ -48,26 +61,25 @@
 }
 
 .song-actions .play-btn:hover {
-  color: #4CAF50; /* Play button (Green) */
+  color: #4CAF50;
   transform: scale(1.1);
 }
 
 .song-actions .heart-btn:hover {
-  color: #FF4081; /* Heart button (Pink) */
+  color: #FF4081;
   transform: scale(1.1);
 }
 
 .song-actions .more-btn:hover {
-  color: #aaa; /* More Options */
+  color: #aaa;
 }
 
-
 .song-actions .delete-btn {
-  color: #FF4C4C; 
+  color: #FF4C4C;
   transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .song-actions .delete-btn:hover {
-  color: #ff0000; 
+  color: #ff0000;
   transform: scale(1.1);
 }
