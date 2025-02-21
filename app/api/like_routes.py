@@ -3,13 +3,13 @@ from flask_login import login_required, current_user
 from app.models import db
 from app.models import Like, Song
 
-like_routes = Blueprint("likes", __name__, url_prefix="/api/songs")
+like_routes = Blueprint("likes", __name__)
 
 # GET User can see the number of likes on a song
 @like_routes.route('/<int:song_id>/likes', methods=['GET'])
 def get_likes(song_id):
-    likes = Like.query.filter_by(song_id=song_id).count()
-    return jsonify({"song_id": song_id, "likes": likes})
+    likes = Like.query.filter_by(song_id=song_id).all()
+    return jsonify({"song_id": song_id, "likes": len(likes), "users": [like.to_dict() for like in likes]}), 200
 
 # POST User can like a song
 @like_routes.route('/<int:song_id>/likes', methods=['POST'])
@@ -24,7 +24,7 @@ def like_song(song_id):
     db.session.add(new_like)
     db.session.commit()
 
-    return jsonify({"message": "User has successfully liked this song!", "song_id":song_id}), 201
+    return jsonify({"message": "User has successfully liked this song!", "new_like_id": new_like.id, "song_id":song_id, "user": current_user.id}), 201
 
 # DELETE User can unlike a song
 @like_routes.route('/<int:song_id>/likes', methods=['DELETE'])

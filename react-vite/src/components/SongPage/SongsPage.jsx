@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSongs, deleteSong } from "../../redux/songs"; 
-import { FaHeart, FaPlay, FaEllipsisH, FaEdit, FaTrash } from "react-icons/fa"; 
+import { fetchSongs, deleteSong } from "../../redux/songs";
+import { FaHeart, FaPlay, FaEllipsisH, FaEdit, FaTrash } from "react-icons/fa";
 import CreateSong from "../CreateSong/CreateSong.jsx";
 import UpdateSong from "../UpdateSong/UpdateSong.jsx";
 import "../SongPage/SongPage.css";
+import LikeButton from "../Likes/likes";
 
 const SongPage = () => {
   const dispatch = useDispatch();
@@ -57,35 +58,11 @@ const SongPage = () => {
         </thead>
         <tbody>
           {songs.map((song, index) => (
-            <tr key={song.id} className="border-b border-gray-800 hover:bg-gray-800">
-              <td className="py-2">{index + 1}</td>
-              <td>{song.title}</td>
-              <td>
-                <button className="mr-2 hover:text-green-400">
-                  <FaPlay />
-                </button>
-                <button className="mr-2 hover:text-red-400">
-                  <FaHeart />
-                </button>
-                <button
-                  className="mr-2 hover:text-blue-400"
-                  onClick={() => setEditingSong(song)}
-                >
-                  <FaEdit />
-                </button>
-                {/* Delete Button */}
-                <button
-                  className="mr-2 hover:text-red-600"
-                  onClick={() => handleDelete(song.id)} // Delete song when clicked
-                >
-                  <FaTrash />
-                </button>
-                <button className="hover:text-gray-400">
-                  <FaEllipsisH />
-                </button>
-              </td>
-            </tr>
-          ))}
+            
+    <SongDetail key={song.id} song={song} index={index} />
+
+
+))}
         </tbody>
       </table>
 
@@ -100,5 +77,40 @@ const SongPage = () => {
     </div>
   );
 };
+
+function SongDetail({ song, index }) {
+  return (
+    <tr className="border-b border-gray-800 hover:bg-gray-800">
+    <td className="py-2">{index + 1}</td>
+    <td>{song.title}</td>
+    <td>
+      <button className="mr-2 hover:text-green-400">
+        <FaPlay />
+      </button>
+      <LikeButton key={song.id} song={song} />
+      <button className="hover:text-gray-400">
+        <FaEllipsisH />
+      </button>
+      <button
+        className="mr-2 hover:text-blue-400"
+        onClick={() => setEditingSong(song)}
+      >
+        <FaEdit />
+      </button>
+      {/* Delete Button */}
+      <button
+        className="mr-2 hover:text-red-600"
+        onClick={() => handleDelete(song.id)} // Delete song when clicked
+      >
+        <FaTrash />
+      </button>
+      <button className="hover:text-gray-400">
+        <FaEllipsisH />
+      </button>
+
+    </td>
+  </tr>
+  )
+}
 
 export default SongPage;

@@ -29,7 +29,12 @@ class Like(db.Model):
     def __init__(self, user_id, song_id):
         self.user_id = user_id
         self.song_id = song_id
-
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "song_id": self.song_id
+        }
         # Add to Liked Songs playlist
         # liked_playlist = Playlist.query.filter_by(user_id=user_id, special_type='liked_songs').first()
         # if not liked_playlist:

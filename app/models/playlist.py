@@ -23,3 +23,11 @@ class Playlist(db.Model):
     user = db.relationship("User", back_populates="playlists")
     songs = db.relationship("PlaylistSong", back_populates="playlist", cascade="all, delete-orphan")
     # libraries = db.relationship("Library", back_populates="playlist", cascade="all, delete-orphan")
+
+    def to_dict(self):
+      return {
+        'id': self.id,
+        'title': self.title,
+        'user_id': self.user_id,
+        'image_url': self.image_url
+    }
