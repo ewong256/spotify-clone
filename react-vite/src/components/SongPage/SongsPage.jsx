@@ -20,7 +20,6 @@ const SongPage = () => {
   if (status === "failed") return <p>Error: {error}</p>;
 
   const handleDelete = (songId) => {
-    // Confirm before deleting
     if (window.confirm("Are you sure you want to delete this song?")) {
       dispatch(deleteSong(songId));
     }
@@ -51,7 +50,9 @@ const SongPage = () => {
         <thead>
           <tr className="border-b border-gray-700">
             <th className="py-2">#</th>
+            <th>Cover</th> {/* New column for image */}
             <th>Title</th>
+            <th>Audio</th> {/* New column for audio */}
             <th>Actions</th>
           </tr>
         </thead>
@@ -59,7 +60,16 @@ const SongPage = () => {
           {songs.map((song, index) => (
             <tr key={song.id} className="border-b border-gray-800 hover:bg-gray-800">
               <td className="py-2">{index + 1}</td>
+              {/* Display Song Image */}
+              <td>
+                <img src={song.image_url} alt={song.title} className="w-16 h-16 rounded" />
+              </td>
               <td>{song.title}</td>
+              {/* Audio Player */}
+              <td>
+                <audio controls src={song.song_url} className="w-full"></audio>
+              </td>
+              {/* Action Buttons */}
               <td>
                 <button className="mr-2 hover:text-green-400">
                   <FaPlay />
@@ -76,7 +86,7 @@ const SongPage = () => {
                 {/* Delete Button */}
                 <button
                   className="mr-2 hover:text-red-600"
-                  onClick={() => handleDelete(song.id)} // Delete song when clicked
+                  onClick={() => handleDelete(song.id)}
                 >
                   <FaTrash />
                 </button>

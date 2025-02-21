@@ -2,38 +2,50 @@ from app.models import db, Song, Album, environment, SCHEMA
 from sqlalchemy.sql import text
 
 def seed_songs():
-
-    # album1 = Album(title='Album One', user_id=1)
-    # album2 = Album(title='Album Two', user_id=2)
-    # album3 = Album(title='Album Three', user_id=3)
-
-    # db.session.add(album1)
-    # db.session.add(album2)
-    # db.session.add(album3)
-    # db.session.commit()
-
-
     song1 = Song(
-        title='Song One', song_url='http://example.com/song1.mp3', user_id=1, image_url='http://example.com/song1.jpg', album_id=1)
+        title='Dreams', 
+        song_url='https://freemusicarchive.org/track/dreams/download/', 
+        user_id=1, 
+        image_url='https://images.pexels.com/photos/164777/pexels-photo-164777.jpeg', 
+        album_id=1
+    )
     song2 = Song(
-        title='Song Two', song_url='http://example.com/song2.mp3', user_id=1, image_url='http://example.com/song2.jpg', album_id=1)
+        title='Night Drive', 
+        song_url='https://freemusicarchive.org/track/night-drive/download/', 
+        user_id=1, 
+        image_url='https://images.pexels.com/photos/370717/pexels-photo-370717.jpeg', 
+        album_id=1
+    )
     song3 = Song(
-        title='Song Three', song_url='http://example.com/song3.mp3', user_id=2, image_url='http://example.com/song3.jpg', album_id=2)
+        title='Golden Hour', 
+        song_url='https://freemusicarchive.org/track/golden-hour/download/', 
+        user_id=2, 
+        image_url='https://images.pexels.com/photos/167599/pexels-photo-167599.jpeg', 
+        album_id=2
+    )
     song4 = Song(
-        title='Song Four', song_url='http://example.com/song4.mp3', user_id=2, image_url='http://example.com/song4.jpg', album_id=2)
+        title='Wanderlust', 
+        song_url='https://freemusicarchive.org/track/wanderlust/download/', 
+        user_id=2, 
+        image_url='https://images.pexels.com/photos/346529/pexels-photo-346529.jpeg', 
+        album_id=2
+    )
     song5 = Song(
-        title='Song Five', song_url='http://example.com/song5.mp3', user_id=3, image_url='http://example.com/song5.jpg', album_id=3)
+        title='Ocean Breeze', 
+        song_url='https://freemusicarchive.org/track/ocean-breeze/download/', 
+        user_id=3, 
+        image_url='https://images.pexels.com/photos/238787/pexels-photo-238787.jpeg', 
+        album_id=3
+    )
     song6 = Song(
-        title='Song Six', song_url='http://example.com/song6.mp3', user_id=3, image_url='http://example.com/song6.jpg', album_id=3)
+        title='Sunset Vibes', 
+        song_url='https://freemusicarchive.org/track/sunset-vibes/download/', 
+        user_id=3, 
+        image_url='https://images.pexels.com/photos/462162/pexels-photo-462162.jpeg', 
+        album_id=3
+    )
 
-
-    db.session.add(song1)
-    db.session.add(song2)
-    db.session.add(song3)
-    db.session.add(song4)
-    db.session.add(song5)
-    db.session.add(song6)
-
+    db.session.add_all([song1, song2, song3, song4, song5, song6])
     db.session.commit()
 
 def undo_songs():
