@@ -91,16 +91,21 @@ const AlbumPage = () => {
       </div>
 
       <div className="tracklist">
-        {albumData.songs.map((song, index) => (
-          <div key={song.id} className="track">
-            <span className="track-number">{index + 1}</span>
-            <span className="track-title">{song.title}</span>
-            <button className="track-play-btn" onClick={() => handlePlay(song.song_url)}>
-              {currentSong === song.song_url ? "⏸ Pause" : "▶ Play"}
-            </button>
-          </div>
-        ))}
+  {Array.isArray(albumData.songs) && albumData.songs.length > 0 ? (
+    albumData.songs.map((song, index) => (
+      <div key={song.id} className="track">
+        <span className="track-number">{index + 1}</span>
+        <span className="track-title">{song.title}</span>
+        <button className="track-play-btn" onClick={() => handlePlay(song.song_url)}>
+          {currentSong === song.song_url ? "⏸ Pause" : "▶ Play"}
+        </button>
       </div>
+    ))
+  ) : (
+    <p>No songs available for this album.</p>
+  )}
+</div>
+
 
       {/* Create Your Own Album Button */}
       <div className="create-album-container">
