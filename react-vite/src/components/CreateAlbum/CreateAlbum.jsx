@@ -1,24 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./CreateAlbum.css";
 
 const CreateAlbum = () => {
   const [title, setTitle] = useState("");
   const [imageFile, setImageFile] = useState(null); // Store image file
   const [numSongs, setNumSongs] = useState(1); // Default to 1 song
-  const [songFiles, setSongFiles] = useState([]); // Store song files
+  const [availableSongs, setAvailableSongs] = useState([]); // Store available songs from database
+  const [selectedSongs, setSelectedSongs] = useState([]); // Store selected song IDs
   const [message, setMessage] = useState("");
 
-  // Handle file changes
-  const handleFileChange = (e, setFile) => {
-    setFile(e.target.files[0]); // Store the selected file
-  };
+  // Fetch available songs from the backend when the component mounts
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const response = await fetch("/api/albums/songs");
+        const data = await response.json();
+        if (response.ok) {
+          setAvailableSongs(data);
+        } else {
+          setMessage("Failed to fetch available songs.");
+        }
+      } catch (error) {
+        console.error("Error fetching songs:", error);
+        setMessage("Error fetching available songs.");
+      }
+    };
 
-  // Handle song file changes dynamically
-  const handleSongFileChange = (e, index) => {
-    const files = [...songFiles];
-    files[index] = e.target.files[0]; // Store file at index
-    setSongFiles(files);
-  };
+    fetchSongs();
+  }, []);
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -31,11 +40,9 @@ const CreateAlbum = () => {
       formData.append("image", imageFile); // Append actual image file
     }
 
-    // Append song files
-    songFiles.forEach((file, index) => {
-      if (file) {
-        formData.append(`audio`, file); // Your Flask backend expects "audio"
-      }
+    // Append selected song IDs (from dropdown)
+    selectedSongs.forEach((songId, index) => {
+      formData.append("song_id", songId); // Send song ID to backend
     });
 
     try {
@@ -52,7 +59,7 @@ const CreateAlbum = () => {
         setMessage("Album created successfully!");
         setTitle("");
         setImageFile(null);
-        setSongFiles([]);
+        setSelectedSongs([]); // Reset song selections
         setNumSongs(1);
       }
     } catch (error) {
@@ -81,7 +88,7 @@ const CreateAlbum = () => {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => handleFileChange(e, setImageFile)}
+            onChange={(e) => setImageFile(e.target.files[0])}
             required
           />
         </label>
@@ -95,22 +102,32 @@ const CreateAlbum = () => {
             value={numSongs}
             onChange={(e) => {
               setNumSongs(parseInt(e.target.value));
-              setSongFiles([]); // Reset song files
+              setSelectedSongs([]); // Reset selected songs
             }}
             required
           />
         </label>
 
-        {/* Dynamic file inputs for songs */}
+        {/* Dynamic selection for songs */}
         {Array.from({ length: numSongs }).map((_, index) => (
           <label key={index}>
-            Upload Song {index + 1}:
-            <input
-              type="file"
-              accept="audio/*"
-              onChange={(e) => handleSongFileChange(e, index)}
+            Select Song {index + 1}:
+            <select
+              value={selectedSongs[index] || ""}
+              onChange={(e) => {
+                const newSelectedSongs = [...selectedSongs];
+                newSelectedSongs[index] = e.target.value;
+                setSelectedSongs(newSelectedSongs);
+              }}
               required
-            />
+            >
+              <option value="">Select a song</option>
+              {availableSongs.map((song) => (
+                <option key={song.id} value={song.id}>
+                  {song.title} by {song.artist}
+                </option>
+              ))}
+            </select>
           </label>
         ))}
 

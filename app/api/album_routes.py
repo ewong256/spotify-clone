@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from app.models import Album
+from app.models import Album, Song, AlbumSong
 from app import db
 
 album_routes = Blueprint('albums', __name__)
@@ -38,13 +38,25 @@ def get_album(album_id):
         return jsonify({"error": "Album not found"}), 404
     return jsonify(album.to_dict(include_songs=True))  # Ensure songs are included
 
-# Create new album
+# Get all available songs
+@album_routes.route('/songs', methods=['GET'])
+def get_available_songs():
+    songs = Song.query.all()
+    return jsonify([song.to_dict() for song in songs])
+
+# Create new album with pre-existing song
 @album_routes.route('', methods=['POST'])
 @login_required
 def create_album():
     title = request.form.get('title')
-    if not title:
-        return jsonify({"error": "Title is required"}), 400
+    song_id = request.form.get('song_id')  # Get song_id from the frontend
+    if not title or not song_id:
+        return jsonify({"error": "Title and song selection are required"}), 400
+
+    # Check if the selected song exists
+    song = Song.query.get(song_id)
+    if not song:
+        return jsonify({"error": "Selected song does not exist"}), 404
 
     image_url = None
 
@@ -68,6 +80,11 @@ def create_album():
     db.session.add(new_album)
     db.session.commit()
 
+    # Create the many-to-many relationship between album and song
+    album_song = AlbumSong(album_id=new_album.id, song_id=song.id)
+    db.session.add(album_song)
+    db.session.commit()
+
     return jsonify({"message": "Album successfully created!", "album": new_album.to_dict()}), 201
 
 # Update an album
@@ -82,10 +99,25 @@ def update_album(album_id):
         return jsonify({"error": "You are not authorized to modify this album."}), 403
 
     title = request.form.get('title')
+    song_id = request.form.get('song_id')  # Get song_id from the frontend for update
     if title:
         album.title = title
 
-    # Update image
+    # Update song if a new one is selected
+    if song_id:
+        song = Song.query.get(song_id)
+        if not song:
+            return jsonify({"error": "Selected song does not exist"}), 404
+
+        # Create or update the many-to-many relationship with the new song
+        album_song = AlbumSong.query.filter_by(album_id=album.id).first()
+        if album_song:
+            album_song.song_id = song.id  # Update existing song
+        else:
+            album_song = AlbumSong(album_id=album.id, song_id=song.id)  # Add new relationship
+            db.session.add(album_song)
+
+    # Update image if provided
     if 'image' in request.files:
         image_file = request.files['image']
         if allowed_file(image_file.filename, ALLOWED_IMAGE_EXTENSIONS):

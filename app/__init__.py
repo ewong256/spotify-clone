@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect, generate_csrf
@@ -39,7 +39,6 @@ Migrate(app, db)
 CORS(app)
 # Application Security
 CORS(app, supports_credentials=True)
-
 
 # Register API routes
 app.register_blueprint(user_routes, url_prefix='/api/users')
@@ -81,6 +80,12 @@ def api_help():
         for rule in app.url_map.iter_rules() if rule.endpoint != 'static'
     }
     return route_list
+
+@app.route('/uploads/images/<path:filename>')
+def upload_file(filename):
+    """Serve files from the 'uploads' folder."""
+    return send_from_directory(os.path.join(app.root_path, 'uploads'), filename)
+
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

@@ -11,15 +11,13 @@ class AlbumSong(db.Model):
         __table_args__ = {'schema': SCHEMA}
 
     id = db.Column(db.Integer, primary_key=True)
-    album_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('albums.id')), nullable=False) #in production, want to reference correct table
-    song_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('songs.id')), nullable=False)
+    album_id = db.Column(db.Integer, db.ForeignKey('albums.id'), nullable=False)
+    song_id = db.Column(db.Integer, db.ForeignKey('songs.id'), nullable=False)
 
-    #RELATIONSHIPS
+    # Relationships
     album = db.relationship("Album", back_populates="songs")
     song = db.relationship("Song", back_populates="albums")
 
-
-    #Same Song cannot appear again in same Album:
-#     __table_args__ = (
-#     db.UniqueConstraint('album_id', 'song_id', name='unique_album_song'),
-# )
+    def to_dict(self):
+        """Retrieve actual song details from the Song table."""
+        return self.song.to_dict()  # Access the song’s to_dict()

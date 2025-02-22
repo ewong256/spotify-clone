@@ -6,6 +6,7 @@ import Layout from './Layout';
 import SongsPage from '../components/SongPage/SongsPage';
 import AlbumPage from '../components/AlbumPage/AlbumPage';
 import CreateAlbum from '../components/CreateAlbum/CreateAlbum';
+import AlbumsList from '../components/AlbumList/AlbumsList';
 
 
 export const router = createBrowserRouter([
@@ -35,6 +36,10 @@ export const router = createBrowserRouter([
       {
         path: "create-album",
         element: <CreateAlbum />,
+      },
+      {
+        path: "albums",
+        element: <AlbumsList />,
       },
       
     ],

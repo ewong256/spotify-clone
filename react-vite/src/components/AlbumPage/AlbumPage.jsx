@@ -77,7 +77,8 @@ const AlbumPage = () => {
     <div className="album-container">
       <div className="album-header">
         <div className="album-cover">
-          <img src={albumData.image_url} alt={`${albumData.title} cover`} />
+          {/* Updated img tag to fetch images from /uploads */}
+          <img src={albumData.image_url} alt={`${albumData.title} cover`}/>
         </div>
         <div className="album-info">
           <h2>{albumData.title}</h2>
@@ -90,22 +91,25 @@ const AlbumPage = () => {
         <button className="more-btn">⋮</button>
       </div>
 
-      <div className="tracklist">
-  {Array.isArray(albumData.songs) && albumData.songs.length > 0 ? (
-    albumData.songs.map((song, index) => (
-      <div key={song.id} className="track">
-        <span className="track-number">{index + 1}</span>
-        <span className="track-title">{song.title}</span>
-        <button className="track-play-btn" onClick={() => handlePlay(song.song_url)}>
-          {currentSong === song.song_url ? "⏸ Pause" : "▶ Play"}
-        </button>
-      </div>
-    ))
-  ) : (
-    <p>No songs available for this album.</p>
-  )}
-</div>
+         <div className="test">
+          <img src="../../../../../app/uploads/images/tylercreator.jpg" alt="Tyler, The Creator" />
+         </div>
 
+      <div className="tracklist">
+        {Array.isArray(albumData.songs) && albumData.songs.length > 0 ? (
+          albumData.songs.map((song, index) => (
+            <div key={song.id} className="track">
+              <span className="track-number">{index + 1}</span>
+              <span className="track-title">{song.title}</span>
+              <button className="track-play-btn" onClick={() => handlePlay(song.song_url)}>
+                {currentSong === song.song_url ? "⏸ Pause" : "▶ Play"}
+              </button>
+            </div>
+          ))
+        ) : (
+          <p>No songs available for this album.</p>
+        )}
+      </div>
 
       {/* Create Your Own Album Button */}
       <div className="create-album-container">
