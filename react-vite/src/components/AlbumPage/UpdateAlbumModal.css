@@ -1,0 +1,143 @@
+/* UpdateAlbumModal.css */
+
+.update-album-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6); /* Darker overlay for better contrast */
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #1e1e1e; /* Dark mode-friendly background */
+    color: #f1f1f1;
+    padding: 25px;
+    border-radius: 12px;
+    width: 420px;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.modal-close-btn:hover {
+    color: #fff;
+}
+
+.modal-body {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Adds spacing between input fields */
+}
+
+.modal-body label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ddd;
+    margin-bottom: 5px;
+}
+
+.modal-body input,
+.modal-body select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #2b2b2b;
+    color: #f1f1f1;
+}
+
+.modal-body input[type="text"] {
+    border: 1px solid #555;
+}
+
+.modal-body input:focus,
+.modal-body select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.5);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 12px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.modal-buttons button:first-child {
+    background-color: #007bff;
+    color: white;
+    margin-right: 10px;
+}
+
+.modal-buttons button:first-child:hover {
+    background-color: #0056b3;
+}
+
+.modal-buttons button:last-child {
+    background-color: #dc3545;
+    color: white;
+}
+
+.modal-buttons button:last-child:hover {
+    background-color: #c82333;
+}
+
+.error-message {
+    color: #ff5c5c;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Modal Fade-In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

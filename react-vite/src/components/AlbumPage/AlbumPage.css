@@ -1,0 +1,145 @@
+.album-container {
+  max-width: 800px;
+  margin: auto;
+  background-color: #121212;
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.album-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.album-cover img {
+  width: 200px;
+  height: 200px;
+  border-radius: 4px;
+}
+
+.album-info h2 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.play-btn,
+.more-btn {
+  background: #1db954;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 50px;
+}
+
+.play-btn:hover,
+.more-btn:hover {
+  background: #1aa34a;
+}
+
+.tracklist {
+  border-top: 1px solid #333;
+  padding-top: 10px;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #222;
+}
+
+.track-number {
+  color: #aaa;
+  font-size: 14px;
+}
+
+.track-title {
+  flex-grow: 1;
+  margin-left: 10px;
+  font-size: 16px;
+}
+
+.track-play-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.track-play-btn:hover {
+  color: #1db954;
+}
+
+/* Album Actions - Align Buttons */
+.album-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Ensures even spacing */
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Standard Button Styles */
+.delete-album-btn,
+.update-album-btn,
+.create-album-btn {
+  flex: 1;
+  max-width: 250px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 25px; /* Rounded corners */
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px; /* Icon spacing */
+}
+
+/* Delete Album Button */
+.delete-album-btn {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.delete-album-btn:hover {
+  background-color: #b71c1c;
+}
+
+/* Update Album Button */
+.update-album-btn {
+  background-color: #ffcc00;
+  color: black;
+}
+
+.update-album-btn:hover {
+  background-color: #e6b800;
+}
+
+/* Create Album Button */
+.create-album-btn {
+  background-color: #1db954;
+  color: white;
+}
+
+.create-album-btn:hover {
+  background-color: #17a74a;
+}

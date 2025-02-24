@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect, generate_csrf
@@ -40,7 +40,6 @@ CORS(app)
 # Application Security
 CORS(app, supports_credentials=True)
 
-
 # Register API routes
 app.register_blueprint(user_routes, url_prefix='/api/users')
 app.register_blueprint(auth_routes, url_prefix='/api/auth')
@@ -49,12 +48,21 @@ app.register_blueprint(album_routes, url_prefix='/api/albums')
 app.register_blueprint(song_routes, url_prefix='/api/songs')
 app.register_blueprint(like_routes, url_prefix='/api/songs')  # Fixed prefix
 
+# # Register API routes
+# app.register_blueprint(user_routes, url_prefix='/api/users')
+# app.register_blueprint(auth_routes, url_prefix='/api/auth')
+# app.register_blueprint(playlist_routes, url_prefix='/api/playlists')
+# app.register_blueprint(album_routes, url_prefix='/api/albums')
+# app.register_blueprint(song_routes, url_prefix='/api/songs')
+# app.register_blueprint(like_routes, url_prefix='/api/songs')  # Fixed prefix
+
 @app.before_request
 def https_redirect():
     """Redirect HTTP to HTTPS in production."""
     if os.environ.get('FLASK_ENV') == 'production':
         if request.headers.get('X-Forwarded-Proto', 'https') != 'https':
             return redirect(request.url.replace('http://', 'https://', 1), code=301)
+
 
 @app.after_request
 def inject_csrf_token(response):
@@ -81,6 +89,12 @@ def api_help():
         for rule in app.url_map.iter_rules() if rule.endpoint != 'static'
     }
     return route_list
+
+@app.route('/uploads/images/<path:filename>')
+def upload_file(filename):
+    """Serve files from the 'uploads' folder."""
+    return send_from_directory(os.path.join(app.root_path, 'uploads'), filename)
+
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
