@@ -1,54 +1,54 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "./CreateAlbum.css";
 
 const CreateAlbum = () => {
   const [title, setTitle] = useState("");
-  const [imageFile, setImageFile] = useState(null); // Store image file
+  const [imageUrl, setImageUrl] = useState(""); // Store image URL instead of file
   const [numSongs, setNumSongs] = useState(1); // Default to 1 song
   const [availableSongs, setAvailableSongs] = useState([]); // Store available songs from database
   const [selectedSongs, setSelectedSongs] = useState([]); // Store selected song IDs
   const [message, setMessage] = useState("");
 
-  // Fetch available songs from the backend when the component mounts
+  const navigate = useNavigate(); // Initialize navigation hook
+
+  // Fetch only unassigned songs from the backend when the component mounts
   useEffect(() => {
-    const fetchSongs = async () => {
+    const fetchUnassignedSongs = async () => {
       try {
-        const response = await fetch("/api/albums/songs");
+        const response = await fetch("/api/albums/songs/unassigned"); // New route
         const data = await response.json();
         if (response.ok) {
           setAvailableSongs(data);
         } else {
-          setMessage("Failed to fetch available songs.");
+          setMessage("Failed to fetch unassigned songs.");
         }
       } catch (error) {
-        console.error("Error fetching songs:", error);
-        setMessage("Error fetching available songs.");
+        console.error("Error fetching unassigned songs:", error);
+        setMessage("Error fetching unassigned songs.");
       }
     };
 
-    fetchSongs();
+    fetchUnassignedSongs();
   }, []);
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("title", title);
-
-    if (imageFile) {
-      formData.append("image", imageFile); // Append actual image file
-    }
-
-    // Append selected song IDs (from dropdown)
-    selectedSongs.forEach((songId, index) => {
-      formData.append("song_id", songId); // Send song ID to backend
-    });
+    const formData = {
+      title,
+      image_url: imageUrl, // Use the image URL instead of file upload
+      song_ids: selectedSongs, // Send selected song IDs as an array
+    };
 
     try {
       const response = await fetch("/api/albums", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json", // Send JSON instead of FormData
+        },
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
@@ -58,9 +58,12 @@ const CreateAlbum = () => {
       } else {
         setMessage("Album created successfully!");
         setTitle("");
-        setImageFile(null);
+        setImageUrl(""); // Reset the image URL field
         setSelectedSongs([]); // Reset song selections
         setNumSongs(1);
+
+        // Redirect to /albums after successful album creation
+        navigate("/albums");
       }
     } catch (error) {
       console.error("Upload error:", error);
@@ -82,13 +85,14 @@ const CreateAlbum = () => {
           />
         </label>
 
-        {/* File input for image */}
+        {/* URL input for album cover */}
         <label>
-          Upload Album Cover:
+          Album Cover URL:
           <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImageFile(e.target.files[0])}
+            type="text"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="Enter image URL"
             required
           />
         </label>
@@ -124,7 +128,7 @@ const CreateAlbum = () => {
               <option value="">Select a song</option>
               {availableSongs.map((song) => (
                 <option key={song.id} value={song.id}>
-                  {song.title} by {song.artist}
+                  {song.title}
                 </option>
               ))}
             </select>
@@ -134,7 +138,7 @@ const CreateAlbum = () => {
         <button type="submit">Create Album</button>
       </form>
 
-      {message && <p>{message}</p>}
+      {message && <p className="message">{message}</p>}
     </div>
   );
 };

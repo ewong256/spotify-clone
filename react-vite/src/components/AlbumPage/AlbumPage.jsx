@@ -1,22 +1,27 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import "./AlbumPage.css";
+import UpdateAlbumModal from "./UpdateAlbumModal";
 
 const AlbumPage = () => {
   const { albumId } = useParams();
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
   const [albumData, setAlbumData] = useState(null);
-  const [username, setUsername] = useState(""); // Store owner's username
+  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentSong, setCurrentSong] = useState(null);
-  const [unauthorized, setUnauthorized] = useState(false); // State for unauthorized access
+  const [unauthorized, setUnauthorized] = useState(false);
+  const [showModal, setShowModal] = useState(false); // State for showing the update modal
+
+  const currentUser = useSelector((state) => state.session.user); // Get logged-in user from Redux
 
   useEffect(() => {
     const fetchAlbumData = async () => {
       try {
-        const response = await fetch(`http://localhost:5173/api/albums/${albumId}`, {
-          credentials: "include", // Ensures cookies/session are sent if authentication is required
+        const response = await fetch(`/api/albums/${albumId}`, {
+          credentials: "include",
         });
 
         if (response.status === 401) {
@@ -27,22 +32,13 @@ const AlbumPage = () => {
         if (!response.ok) throw new Error(`Failed to fetch album (status: ${response.status})`);
 
         const data = await response.json();
-        console.log("Album Data:", data);
         setAlbumData(data);
 
-        // Fetch username using user_id
         if (data.user_id) {
-          const userResponse = await fetch(`http://localhost:5173/api/users/${data.user_id}`);
-
-          if (userResponse.status === 401) {
-            setUnauthorized(true);
-            throw new Error("Unauthorized - Please log in.");
-          }
-
+          const userResponse = await fetch(`/api/users/${data.user_id}`);
           if (!userResponse.ok) throw new Error("Failed to fetch user");
 
           const userData = await userResponse.json();
-          console.log("User Data:", userData);
           setUsername(userData.username);
         }
       } catch (err) {
@@ -55,10 +51,6 @@ const AlbumPage = () => {
     fetchAlbumData();
   }, [albumId]);
 
-  if (unauthorized) return <div className="error">Unauthorized - Please log in.</div>;
-  if (loading) return <div className="loading">Loading album...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
-
   const handlePlay = (songUrl) => {
     if (currentSong === songUrl) {
       setCurrentSong(null);
@@ -69,20 +61,37 @@ const AlbumPage = () => {
     }
   };
 
-  const handleCreateAlbum = () => {
-    navigate("/create-album"); // Redirects to the album creation page
+  const handleDeleteAlbum = async () => {
+    try {
+      const response = await fetch(`/api/albums/${albumId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        navigate("/albums"); // Redirect after deletion
+      } else {
+        const data = await response.json();
+        setError(data.error || "Failed to delete album.");
+      }
+    } catch (error) {
+      setError("An error occurred while deleting the album.");
+    }
   };
+
+  if (unauthorized) return <div className="error">Unauthorized - Please log in.</div>;
+  if (loading) return <div className="loading">Loading album...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
     <div className="album-container">
       <div className="album-header">
         <div className="album-cover">
-          {/* Updated img tag to fetch images from /uploads */}
-          <img src={albumData.image_url} alt={`${albumData.title} cover`}/>
+          <img src={albumData.image_url} alt={`${albumData.title} cover`} />
         </div>
         <div className="album-info">
           <h2>{albumData.title}</h2>
-          <p className="owner">By {username ? username : "Unknown Artist"}</p>
+          <p className="owner">By {username || "Unknown Artist"}</p>
         </div>
       </div>
 
@@ -90,10 +99,6 @@ const AlbumPage = () => {
         <button className="play-btn">▶ Play</button>
         <button className="more-btn">⋮</button>
       </div>
-
-         <div className="test">
-          <img src="../../../../../app/uploads/images/tylercreator.jpg" alt="Tyler, The Creator" />
-         </div>
 
       <div className="tracklist">
         {Array.isArray(albumData.songs) && albumData.songs.length > 0 ? (
@@ -111,12 +116,30 @@ const AlbumPage = () => {
         )}
       </div>
 
-      {/* Create Your Own Album Button */}
-      <div className="create-album-container">
-        <button className="create-album-btn" onClick={handleCreateAlbum}>
+      <div className="album-actions">
+        {currentUser && (
+          <>
+            <button className="delete-album-btn" onClick={handleDeleteAlbum}>
+              🗑️ Delete Album
+            </button>
+            <button className="update-album-btn" onClick={() => setShowModal(true)}>
+              ✏️ Update Album
+            </button>
+          </>
+        )}
+        <button className="create-album-btn" onClick={() => navigate("/create-album")}>
           Create Your Own Album
         </button>
       </div>
+
+      {/* Update Album Modal */}
+      <UpdateAlbumModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        albumData={albumData}
+        albumId={albumId}
+        setAlbumData={setAlbumData}
+      />
     </div>
   );
 };

@@ -38,54 +38,55 @@ def get_album(album_id):
         return jsonify({"error": "Album not found"}), 404
     return jsonify(album.to_dict(include_songs=True))  # Ensure songs are included
 
+@album_routes.route('/songs/unassigned', methods=['GET'])
+def get_unassigned_songs():
+    # Fetch songs that are NOT in any album
+    unassigned_songs = Song.query.filter(~Song.albums.any()).all()
+    return jsonify([song.to_dict() for song in unassigned_songs])
+
+
 # Get all available songs
 @album_routes.route('/songs', methods=['GET'])
 def get_available_songs():
     songs = Song.query.all()
     return jsonify([song.to_dict() for song in songs])
 
-# Create new album with pre-existing song
+# Create album
 @album_routes.route('', methods=['POST'])
 @login_required
 def create_album():
-    title = request.form.get('title')
-    song_id = request.form.get('song_id')  # Get song_id from the frontend
-    if not title or not song_id:
-        return jsonify({"error": "Title and song selection are required"}), 400
+    data = request.get_json()  # Read JSON data instead of form data
 
-    # Check if the selected song exists
-    song = Song.query.get(song_id)
-    if not song:
-        return jsonify({"error": "Selected song does not exist"}), 404
+    title = data.get('title')
+    song_ids = data.get('song_ids')  # Expecting list of song IDs
+    image_url = data.get('image_url')  # Image URL instead of uploaded file
 
-    image_url = None
+    if not title or not song_ids:
+        return jsonify({"error": "Title and at least one song selection are required"}), 400
 
-    # Save image file
-    if 'image' in request.files:
-        image_file = request.files['image']
-        if allowed_file(image_file.filename, ALLOWED_IMAGE_EXTENSIONS):
-            filename = secure_filename(image_file.filename)
-            image_path = os.path.join(IMAGE_UPLOAD_FOLDER, filename)
-            image_file.save(image_path)
-            image_url = f"/uploads/images/{filename}"  # Store relative URL
-        else:
-            return jsonify({"error": "Invalid image format"}), 400
+    # Ensure all song IDs exist
+    songs = Song.query.filter(Song.id.in_(song_ids)).all()
+    if len(songs) != len(song_ids):
+        return jsonify({"error": "One or more selected songs do not exist"}), 404
 
+    # Create new album
     new_album = Album(
         title=title,
         user_id=current_user.id,
-        image_url=image_url
+        image_url=image_url  # Use URL directly
     )
 
     db.session.add(new_album)
     db.session.commit()
 
-    # Create the many-to-many relationship between album and song
-    album_song = AlbumSong(album_id=new_album.id, song_id=song.id)
-    db.session.add(album_song)
+    # Add selected songs to album
+    album_songs = [AlbumSong(album_id=new_album.id, song_id=song.id) for song in songs]
+    db.session.bulk_save_objects(album_songs)
     db.session.commit()
 
     return jsonify({"message": "Album successfully created!", "album": new_album.to_dict()}), 201
+
+
 
 # Update an album
 @album_routes.route('/<int:album_id>', methods=['PUT'])
