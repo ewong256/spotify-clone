@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./UpdateAlbumModal.css";
 
 const UpdateAlbumModal = ({ showModal, setShowModal, albumData, albumId, setAlbumData }) => {
