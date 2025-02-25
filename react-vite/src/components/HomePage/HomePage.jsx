@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"; // Added useState for available songs
 import { useSelector, useDispatch } from "react-redux";
 import { fetchSongs } from "../../redux/songs";
 import { 
@@ -11,31 +11,28 @@ import "./HomePage.css";
 
 const HomePage = () => {
     const dispatch = useDispatch();
-    
-    // Get data from Redux store
     const { songs, status: songsStatus, error: songsError } = useSelector((state) => state.songs);
-    const playlists = useSelector((state) => state.playlists);
+    const playlists = useSelector((state) => state.playlists); // Object of playlists
     const currentUser = useSelector((state) => state.session.user);
 
-    // Local state for albums (instead of Redux)
-    const [albums, setAlbums] = useState([]);
-    const [albumsError, setAlbumsError] = useState(null);
-
-    // Local state for available songs in playlists
-    const [availableSongs, setAvailableSongs] = useState([]);
+    const [availableSongs, setAvailableSongs] = useState([]); // To pick a song for add/remove
+    const [albums, setAlbums] = useState([]); // For albums
+    const [albumsError, setAlbumsError] = useState(null); // For album errors
 
     useEffect(() => {
         // Fetch songs
         dispatch(fetchSongs());
 
-        // Fetch playlists if user is logged in
+        // Fetch playlists
         if (currentUser?.id) {
             dispatch(thunkFetchAllPlaylists());
         }
     }, [dispatch, currentUser]);
 
+    // Fetch available songs and trigger add/remove for a playlist
     useEffect(() => {
         if (currentUser?.id) {
+            // Fetch available songs for a sample playlist (e.g., first playlist ID)
             const firstPlaylistId = Object.keys(playlists)[0];
             if (firstPlaylistId) {
                 fetch(`/api/playlists/${firstPlaylistId}/songs`, {
@@ -43,9 +40,11 @@ const HomePage = () => {
                 })
                     .then((res) => res.json())
                     .then((data) => {
+                        console.log("Playlist available songs:", data);
                         const available = data.available_songs || [];
                         setAvailableSongs(available);
 
+                        // Add and remove a song to update playlist songs
                         if (available.length > 0) {
                             const songToAdd = available[0].id;
                             dispatch(thunkAddSong(firstPlaylistId, songToAdd)).then((success) => {
@@ -60,8 +59,8 @@ const HomePage = () => {
         }
     }, [dispatch, currentUser, playlists]);
 
+    // Fetch albums (without using Redux)
     useEffect(() => {
-        // Fetch albums (without using Redux)
         const fetchAlbums = async () => {
             try {
                 const response = await fetch("/api/albums");
@@ -99,8 +98,10 @@ const HomePage = () => {
                     <div className="list">
                         {albums.map((album) => (
                             <Link key={album.id} to={`/album/${album.id}`} className="album-item">
-                                <img src={album.image_url} alt={`${album.title} cover`} className="album-cover" />
-                                <p>{album.title}</p>
+                                <div className="album-cover-container">
+                                    <img src={album.image_url} alt={`${album.title} cover`} className="album-cover" />
+                                    <p className="album-title">{album.title}</p>
+                                </div>
                             </Link>
                         ))}
                     </div>
@@ -115,12 +116,17 @@ const HomePage = () => {
                     <div className="list">
                         {Object.values(playlists).map((pl) => (
                             <Link key={pl.id} to={`/playlists/${pl.id}`} className="item">
-                                {pl.name}
+                                {pl.title}
                             </Link>
                         ))}
                     </div>
                 ) : (
                     <p>No playlists available.</p>
+                )}
+                {currentUser && (
+                    <Link to="/playlists">
+                        <button className="manage-playlists-btn">Manage Playlists</button>
+                    </Link>
                 )}
             </section>
         </div>
