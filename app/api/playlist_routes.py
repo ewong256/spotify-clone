@@ -56,7 +56,7 @@ def get_playlist(playlist_id):
         "id": ps.song.id,
         "title": ps.song.title,
         "artist": ps.song.user.username,  # Use username from User relationship
-        "album": ps.song.albums[0].album.album_name if ps.song.albums else None  # Assuming AlbumSong links to Album
+        "album": ps.song.albums[0].album.title if ps.song.albums else None  # Assuming AlbumSong links to Album
     } for ps in playlist.songs]
 
     available_songs = Song.query.all()
@@ -127,7 +127,7 @@ def get_playlist_songs(playlist_id):
                 "id": ps.song.id,
                 "title": ps.song.title,
                 "artist": ps.song.user.username,  # Use username from User relationship
-                "album": ps.song.albums[0].album.album_name if ps.song.albums else None  # Assuming AlbumSong links to Album
+                "album": ps.song.albums[0].album.title if ps.song.albums else None  # Assuming AlbumSong links to Album
             } for ps in playlist.songs]
         except AttributeError as e:
             logger.error(f"Error processing playlist songs: {e}")
@@ -187,7 +187,7 @@ def add_song_to_playlist(playlist_id):
         "id": ps.song.id,
         "title": ps.song.title,
         "artist": ps.song.user.username,  # Use username from User relationship
-        "album": ps.song.albums[0].album.album_name if ps.song.albums else None  # Assuming AlbumSong links to Album
+        "album": ps.song.albums[0].album.title if ps.song.albums else None  # Assuming AlbumSong links to Album
     } for ps in playlist.songs]
 
     return jsonify({
@@ -218,7 +218,7 @@ def remove_song_from_playlist(playlist_id, song_id):
         "id": ps.song.id,
         "title": ps.song.title,
         "artist": ps.song.user.username,  # Use username from User relationship
-        "album": ps.song.albums[0].album.album_name if ps.song.albums else None  # Assuming AlbumSong links to Album
+        "album": ps.song.albums[0].album.title if ps.song.albums else None  # Assuming AlbumSong links to Album
     } for ps in playlist.songs]
 
     return jsonify({
