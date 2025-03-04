@@ -38,6 +38,10 @@
   display: block;
 }
 
+.w-16.h-16.rounded {
+  width: 100px !important;
+  height: 90px !important;
+}
 
 .song-table td audio {
   width: 150px;
