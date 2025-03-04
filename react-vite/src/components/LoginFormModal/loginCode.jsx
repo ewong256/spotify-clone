@@ -47,7 +47,7 @@ function LoginFormModal() {
 
     try {
       const response = await dispatch(
-        sessionActions.thunkLogin({ email: 'demo1@aa.io', password: 'password1' }) // No need to update state
+        sessionActions.thunkLogin({ credential: 'demo1@aa.io', password: 'password1' }) // No need to update state
       );
 
       if (!response) {
