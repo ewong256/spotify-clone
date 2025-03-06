@@ -42,48 +42,68 @@ def get_song(id):
     return jsonify(song.to_dict()), 200
 
 
-# Create a new song without AWS S3
+# Create a new song
 @song_routes.route("", methods=["POST"])
 @login_required
 def create_song():
     """
     Create a new song and store image/audio as binary data in the database.
     """
-    data = request.form  # Use form-data for file uploads
+    try:
+        # Debugging: Log incoming request data
+        print("Received request to create a song.")
 
-    # Validate required fields
-    if "title" not in data or "album_id" not in data:
-        return jsonify({"error": "Title and album_id are required"}), 400
+        data = request.form  # Use form-data for file uploads
 
-    image_data = None
-    song_data = None
+        # Validate required fields
+        if "title" not in data or "album_id" not in data:
+            return jsonify({"error": "Title and album_id are required"}), 400
 
-    # Handle Image Upload
-    if "image" in request.files:
-        image_file = request.files["image"]
-        if not allowed_file(image_file.filename, ALLOWED_IMAGE_EXTENSIONS):
-            return jsonify({"error": "Invalid image format"}), 400
-        image_data = image_file.read()  # Read image as binary
+        image_data = None
+        song_data = None
 
-    # Handle Song Upload
-    if "song" in request.files:
-        song_file = request.files["song"]
-        if not allowed_file(song_file.filename, ALLOWED_AUDIO_EXTENSIONS):
-            return jsonify({"error": "Invalid song format"}), 400
-        song_data = song_file.read()  # Read song as binary
+        # Handle Image Upload
+        if "image" in request.files:
+            image_file = request.files["image"]
+            if not allowed_file(image_file.filename, ALLOWED_IMAGE_EXTENSIONS):
+                return jsonify({"error": "Invalid image format"}), 400
+            image_data = image_file.read()  # Read image as binary
+            print("Image file successfully processed.")  # Debugging
 
-    # Create Song
-    new_song = Song(
-        title=data["title"],
-        song_data=song_data,  # Store binary data
-        album_id=data["album_id"],
-        user_id=current_user.id,
-        image_data=image_data  # Store binary data
-    )
+        # Handle Song Upload
+        if "song" in request.files:
+            song_file = request.files["song"]
+            if not allowed_file(song_file.filename, ALLOWED_AUDIO_EXTENSIONS):
+                return jsonify({"error": "Invalid song format"}), 400
+            song_data = song_file.read()  # Read song as binary
+            print("Song file successfully processed.")  # Debugging
+        else:
+            return jsonify({"error": "Song file is required"}), 400  # Ensure a song is uploaded
 
-    db.session.add(new_song)
-    db.session.commit()
-    return jsonify({"message": "Song successfully created!", "song": new_song.to_dict()}), 201
+        # Convert album_id to integer
+        try:
+            album_id = int(data["album_id"])
+        except ValueError:
+            return jsonify({"error": "album_id must be an integer"}), 400
+
+        # Create Song
+        new_song = Song(
+            title=data["title"],
+            song_data=song_data,
+            album_id=album_id,
+            user_id=current_user.id,
+            image_data=image_data
+        )
+
+        db.session.add(new_song)
+        db.session.commit()
+
+        print("Song successfully created!")  # Debugging
+        return jsonify({"message": "Song successfully created!", "song": new_song.to_dict()}), 201
+
+    except Exception as e:
+        print(f"Server Error: {str(e)}")  # Debugging
+        return jsonify({"error": "An unexpected error occurred"}), 500
 
 
 # Update an existing song
