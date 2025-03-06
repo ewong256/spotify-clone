@@ -5,37 +5,41 @@ import "../CreateSong/CreateSong.css";
 
 const CreateSong = () => {
   const [title, setTitle] = useState("");
-  const [songUrl, setSongUrl] = useState("");
   const [albumId, setAlbumId] = useState(1);
-  const [file, setFile] = useState(null);
+  const [image, setImage] = useState(null);
+  const [songFile, setSongFile] = useState(null);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
 
-  const handleFileChange = (e) => setFile(e.target.files[0]);
+  const handleImageChange = (e) => setImage(e.target.files[0]);
+  const handleSongChange = (e) => setSongFile(e.target.files[0]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!file) {
-      setError("Please select a file.");
+    if (!songFile) {
+      setError("Please select a song file.");
       return;
     }
 
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("song_url", songUrl);
     formData.append("album_id", albumId);
-    formData.append("file", file);
+    formData.append("song", songFile); // ✅ Match Flask backend expected key
+
+    if (image) {
+      formData.append("image", image); // ✅ If user uploads an image, send it
+    }
 
     try {
       const response = await dispatch(createSong(formData));
 
-      if (response?.payload?.id) {
+      if (response?.payload?.song) {
         alert("Song uploaded successfully!");
         setTitle("");
-        setSongUrl("");
         setAlbumId(1);
-        setFile(null);
+        setImage(null);
+        setSongFile(null);
         setError(null);
       } else {
         setError("Failed to upload song.");
@@ -48,6 +52,7 @@ const CreateSong = () => {
   return (
     <form onSubmit={handleSubmit}>
       {error && <p className="error">{error}</p>}
+      
       <input
         type="text"
         value={title}
@@ -55,13 +60,7 @@ const CreateSong = () => {
         placeholder="Song Title"
         required
       />
-      <input
-        type="url"
-        value={songUrl}
-        onChange={(e) => setSongUrl(e.target.value)}
-        placeholder="Song URL"
-        required
-      />
+
       <input
         type="number"
         value={albumId}
@@ -69,7 +68,10 @@ const CreateSong = () => {
         placeholder="Album ID"
         required
       />
-      <input type="file" onChange={handleFileChange} required />
+
+      <input type="file" accept="image/*" onChange={handleImageChange} />
+      <input type="file" accept="audio/*" onChange={handleSongChange} required />
+
       <button type="submit">Upload Song</button>
     </form>
   );

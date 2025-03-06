@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 import uuid
 from app.models import Like
 from sqlalchemy.orm import joinedload
+
 song_routes = Blueprint("songs", __name__)
 
 # Allowed file extensions
@@ -83,3 +84,65 @@ def create_song():
     db.session.add(new_song)
     db.session.commit()
     return jsonify({"message": "Song successfully created!", "song": new_song.to_dict()}), 201
+
+
+# Update an existing song
+@song_routes.route("/<int:id>", methods=["PUT"])
+@login_required
+def update_song(id):
+    """
+    Update an existing song.
+    """
+    song = Song.query.get(id)
+
+    if not song:
+        return jsonify({"error": "Song not found"}), 404
+
+    if song.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized to edit this song"}), 403
+
+    data = request.form  # Expecting form-data for file uploads
+
+    # Update title and album_id if present
+    if "title" in data:
+        song.title = data["title"]
+    if "album_id" in data:
+        song.album_id = data["album_id"]
+
+    # Handle image update (if provided)
+    if "image" in request.files:
+        image_file = request.files["image"]
+        if not allowed_file(image_file.filename, ALLOWED_IMAGE_EXTENSIONS):
+            return jsonify({"error": "Invalid image format"}), 400
+        song.image_data = image_file.read()
+
+    # Handle song update (if provided)
+    if "song" in request.files:
+        song_file = request.files["song"]
+        if not allowed_file(song_file.filename, ALLOWED_AUDIO_EXTENSIONS):
+            return jsonify({"error": "Invalid song format"}), 400
+        song.song_data = song_file.read()
+
+    db.session.commit()
+    return jsonify({"message": "Song successfully updated!", "song": song.to_dict()}), 200
+
+
+# Delete a song
+@song_routes.route("/<int:id>", methods=["DELETE"])
+@login_required
+def delete_song(id):
+    """
+    Delete a song by ID.
+    """
+    song = Song.query.get(id)
+
+    if not song:
+        return jsonify({"error": "Song not found"}), 404
+
+    if song.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    db.session.delete(song)
+    db.session.commit()
+
+    return jsonify({"message": "Song deleted successfully", "song_id": id}), 200
