@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response
 from flask_login import login_required, current_user
 from app.models import db, Song
 from werkzeug.utils import secure_filename
@@ -40,6 +40,32 @@ def get_song(id):
     if not song:
         return jsonify({"error": "Oops! We couldn't find the song you're looking for."}), 404
     return jsonify(song.to_dict()), 200
+
+
+# Retrieve the image file of a song
+@song_routes.route("/<int:id>/image", methods=["GET"])
+def get_song_image(id):
+    """
+    Retrieve the image file of a song.
+    """
+    song = Song.query.get(id)
+    if not song or not song.image_data:
+        return jsonify({"error": "Image not found"}), 404
+
+    return Response(song.image_data, mimetype="image/jpeg")
+
+
+# Retrieve the audio file of a song
+@song_routes.route("/<int:id>/audio", methods=["GET"])
+def get_song_audio(id):
+    """
+    Retrieve the audio file of a song.
+    """
+    song = Song.query.get(id)
+    if not song or not song.song_data:
+        return jsonify({"error": "Audio not found"}), 404
+
+    return Response(song.song_data, mimetype="audio/mpeg")
 
 
 # Create a new song
