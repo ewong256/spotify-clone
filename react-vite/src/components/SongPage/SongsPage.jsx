@@ -95,7 +95,7 @@ function SongDetail({ song, index, setEditingSong }) {
       <td>{song.title}</td>
       <td>
         <audio id={`audio-${song.id}`} controls>
-          <source src={song.song_url} type="audio/mpeg" />
+          <source src={`http://localhost:5000${song.song_url}`} type="audio/mpeg" />
           Your browser does not support the audio element.
         </audio>
       </td>
