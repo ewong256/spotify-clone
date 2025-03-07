@@ -73,16 +73,21 @@ const SongPage = () => {
 function SongDetail({ song, index, setEditingSong }) {
   const dispatch = useDispatch();
 
-  const handleDelete = (songId) => {
-    if (window.confirm("Are you sure you want to delete this song?")) {
-      dispatch(deleteSong(songId));
-    }
-  };
+  const handleDelete = async (songId) => {
+    if (!window.confirm("Are you sure you want to delete this song?")) return;
 
-  const handlePlay = () => {
-    const audioElement = document.getElementById(`audio-${song.id}`);
-    if (audioElement) {
-      audioElement.play();
+    try {
+      const response = await dispatch(deleteSong(songId));
+
+      if (response.error) {
+        if (response.error.message.includes("Unauthorized")) {
+          alert("Sorry, this is not your song.");
+        } else {
+          alert("An error occurred while trying to delete the song.");
+        }
+      }
+    } catch (error) {
+      alert("An error occurred while trying to delete the song.");
     }
   };
 
@@ -94,13 +99,10 @@ function SongDetail({ song, index, setEditingSong }) {
       </td>
       <td>{song.title}</td>
       <td>
-        <audio id={`audio-${song.id}`} controls>
-          <source src={`http://localhost:5000${song.song_url}`} type="audio/mpeg" />
-          Your browser does not support the audio element.
-        </audio>
+        <audio controls src={`http://localhost:5000${song.song_url}`} className="w-full"></audio>
       </td>
       <td>
-        <button className="mr-2 hover:text-green-400" onClick={handlePlay}>
+        <button className="mr-2 hover:text-green-400">
           <FaPlay />
         </button>
         <LikeButton song={song} />
