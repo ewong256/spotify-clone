@@ -73,21 +73,9 @@ const SongPage = () => {
 function SongDetail({ song, index, setEditingSong }) {
   const dispatch = useDispatch();
 
-  const handleDelete = async (songId) => {
-    if (!window.confirm("Are you sure you want to delete this song?")) return;
-  
-    try {
-      const response = await dispatch(deleteSong(songId));
-  
-      if (response.error) {
-        if (response.error.message.includes("Unauthorized")) {
-          alert("Sorry, this is not your song.");
-        } else {
-          alert("An error occurred while trying to delete the song.");
-        }
-      }
-    } catch (error) {
-      alert("An error occurred while trying to delete the song.");
+  const handleDelete = (songId) => {
+    if (window.confirm("Are you sure you want to delete this song?")) {
+      dispatch(deleteSong(songId));
     }
   };
 
