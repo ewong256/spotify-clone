@@ -34,13 +34,13 @@ const AlbumPage = () => {
         const data = await response.json();
         setAlbumData(data);
 
-        if (data.user_id) {
-          const userResponse = await fetch(`/api/users/${data.user_id}`);
-          if (!userResponse.ok) throw new Error("Failed to fetch user");
+        // if (data.user_id) {
+        //   const userResponse = await fetch(`/api/users/${data.user_id}`);
+        //   if (!userResponse.ok) throw new Error("Failed to fetch user");
 
-          const userData = await userResponse.json();
-          setUsername(userData.username);
-        }
+        //   const userData = await userResponse.json();
+        //   setUsername(userData.username);
+        // }
       } catch (err) {
         setError(err.message);
       } finally {

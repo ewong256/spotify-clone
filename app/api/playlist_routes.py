@@ -33,7 +33,7 @@ def create_playlist():
 
 # GET All Playlists (Publicly accessible)
 @playlist_routes.route('', methods=['GET'])
-@login_required
+# @login_required
 def get_all_playlists():
     playlists = Playlist.query.all()
     return jsonify([{
@@ -45,7 +45,7 @@ def get_all_playlists():
 
 # GET a Specific Playlist
 @playlist_routes.route('/<int:playlist_id>', methods=['GET'])
-@login_required
+# @login_required
 def get_playlist(playlist_id):
     playlist = Playlist.query.get_or_404(playlist_id)
 
@@ -111,7 +111,7 @@ def delete_playlist(playlist_id):
 
 # GET Songs in Playlist and Available Songs
 @playlist_routes.route('/<int:playlist_id>/songs', methods=['GET'])
-@login_required
+# @login_required
 def get_playlist_songs(playlist_id):
     try:
         playlist = Playlist.query.get_or_404(playlist_id)
