@@ -36,6 +36,8 @@ export const fetchSongs = () => async (dispatch) => {
   dispatch(fetchSongsStart());
   try {
     const response = await fetch("/api/songs");
+    if (!response.ok) throw new Error("Failed to fetch songs");
+    
     const data = await response.json();
     dispatch(fetchSongsSuccess(data.songs));
   } catch (error) {
@@ -50,6 +52,12 @@ export const createSong = (formData) => async (dispatch) => {
       method: "POST",
       body: formData,
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to create song");
+    }
+
     const data = await response.json();
     dispatch(createSongSuccess(data.song));
   } catch (error) {
@@ -64,6 +72,12 @@ export const updateSong = (songId, formData) => async (dispatch) => {
       method: "PUT",
       body: formData,
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to update song");
+    }
+
     const data = await response.json();
     dispatch(updateSongSuccess(data.song));
   } catch (error) {
@@ -79,10 +93,11 @@ export const deleteSong = (songId) => async (dispatch) => {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to delete the song");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to delete the song");
     }
 
-    dispatch(deleteSongSuccess(songId)); // remove song from the Redux store
+    dispatch(deleteSongSuccess(songId)); // Remove song from Redux store
   } catch (error) {
     dispatch(deleteSongFailure(error.message));
   }

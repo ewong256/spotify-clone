@@ -79,6 +79,13 @@ function SongDetail({ song, index, setEditingSong }) {
     }
   };
 
+  const handlePlay = () => {
+    const audioElement = document.getElementById(`audio-${song.id}`);
+    if (audioElement) {
+      audioElement.play();
+    }
+  };
+
   return (
     <tr className="border-b border-gray-800 hover:bg-gray-800">
       <td className="py-2">{index + 1}</td>
@@ -87,10 +94,13 @@ function SongDetail({ song, index, setEditingSong }) {
       </td>
       <td>{song.title}</td>
       <td>
-        <audio controls src={song.song_url} className="w-full"></audio>
+        <audio id={`audio-${song.id}`} controls>
+          <source src={`http://localhost:5000${song.song_url}`} type="audio/mpeg" />
+          Your browser does not support the audio element.
+        </audio>
       </td>
       <td>
-        <button className="mr-2 hover:text-green-400">
+        <button className="mr-2 hover:text-green-400" onClick={handlePlay}>
           <FaPlay />
         </button>
         <LikeButton song={song} />

@@ -48,13 +48,11 @@ app.register_blueprint(album_routes, url_prefix='/api/albums')
 app.register_blueprint(song_routes, url_prefix='/api/songs')
 app.register_blueprint(like_routes, url_prefix='/api/songs')  # Fixed prefix
 
-# # Register API routes
-# app.register_blueprint(user_routes, url_prefix='/api/users')
-# app.register_blueprint(auth_routes, url_prefix='/api/auth')
-# app.register_blueprint(playlist_routes, url_prefix='/api/playlists')
-# app.register_blueprint(album_routes, url_prefix='/api/albums')
-# app.register_blueprint(song_routes, url_prefix='/api/songs')
-# app.register_blueprint(like_routes, url_prefix='/api/songs')  # Fixed prefix
+# Route to serve audio files
+@app.route('/static/uploads/songs/<path:filename>')
+def serve_audio(filename):
+    """Serve audio files from the static uploads folder."""
+    return send_from_directory(os.path.join(app.root_path, 'static/uploads/songs'), filename)
 
 @app.before_request
 def https_redirect():
@@ -62,7 +60,6 @@ def https_redirect():
     if os.environ.get('FLASK_ENV') == 'production':
         if request.headers.get('X-Forwarded-Proto', 'https') != 'https':
             return redirect(request.url.replace('http://', 'https://', 1), code=301)
-
 
 @app.after_request
 def inject_csrf_token(response):
@@ -94,7 +91,6 @@ def api_help():
 def upload_file(filename):
     """Serve files from the 'uploads' folder."""
     return send_from_directory(os.path.join(app.root_path, 'uploads'), filename)
-
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
