@@ -83,11 +83,11 @@ function SongDetail({ song, index, setEditingSong }) {
         if (response.error.message.includes("Unauthorized")) {
           alert("Sorry, this is not your song.");
         } else {
-          alert("An error occurred while trying to delete the song.");
+          alert("Sorry, this is not your song.");
         }
       }
     } catch (error) {
-      alert("An error occurred while trying to delete the song.");
+      alert("Sorry, this is not your song.");
     }
   };
 
